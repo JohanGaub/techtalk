@@ -1,0 +1,88 @@
+version: '3.3'
+
+services:
+    php_apache:
+#        image: php:${PHP_VERSION}
+        build: docker
+#            context: .
+#            dockerfile: ./docker/Dockerfile
+        container_name: ${PROJECT_NAME}_php_apache
+        restart: 'always'
+        ports:
+            - "8000:80"
+        env_file:
+            - .env
+        user: 1000:1000
+        volumes:
+            - ./docker/vhosts:/etc/apache2/sites-enabled
+            - ./:${WEB_FOLDER}
+        networks:
+            - my-network
+            # - .:${WEB_FOLDER}:delegate
+            # The current directory on your host machine is mounted into the Docker container at the location /var/www/symfony, and the container can manage this volume as it sees fit.
+            # The ':delegate' option tells Docker to delegate control of that directory to the Docker daemon. This means that Docker will manage that directory's contents, rather than Symfony.
+            #links:
+            #  - database
+            #depends_on:
+            # - database
+            #volumes:
+            # - ./:/var/www/
+
+    database:
+        image: mysql:${MYSQL_VERSION}
+        container_name: ${PROJECT_NAME}_mysql
+        restart: 'always'
+        volumes:
+            - db-data:/var/lib/mysql:consistent
+            # "consistent" means that the contents of the volume on the host machine will always match the contents of the volume in the container.
+
+            # Or you can set the target like this. The container can read and write data in the volume.
+            # target: /var/lib/mysql:rw
+        networks:
+            - my-network
+        environment:
+            DATABASE_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+            DATABASE_USER: ${DATABASE_USER}
+            DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+            DATABASE_NAME: ${DATABASE_NAME}
+        ports:
+            - "3307:3306"
+        expose:
+            - 3306
+
+    adminer:
+        image: adminer:${ADMINER_VERSION}
+        container_name: ${PROJECT_NAME}_adminer
+        restart: always
+        networks:
+            - my-network
+        depends_on:
+            - database
+        ports:
+            - "8080:80"
+        environment:
+            PMA_HOST: database
+            PMA_PORT: 3306
+
+    #    phpmyadmin:
+    #        image: phpmyadmin/phpmyadmin
+    #        container_name: ${PROJECT_NAME}_phpmyadmin
+    #        networks:
+    #            - my-network
+    #        environment:
+    #            PMA_HOST: database
+    #            PMA_PORT: 3306
+    #        ports:
+    #            - "8081:80"
+    #        depends_on:
+    #            - database
+
+    mailer:
+        image: schickling/mailcatcher
+        ports: [ "1025", "1080" ]
+
+networks:
+    my-network:
+
+volumes:
+    db-data:
