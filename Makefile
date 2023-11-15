@@ -5,7 +5,7 @@
 DOCKER = docker
 DOCKER_RUN = $(DOCKER) run
 # —— docker-composer ————————————————————————————
-DOCKER_COMPOSE=@docker-compose ${DOCKER_COMPOSE_FILES}
+DOCKER_COMPOSE=@docker compose ${DOCKER_COMPOSE_FILES}
 DOCKER_COMPOSE_UP = $(DOCKER_COMPOSE) up -d
 #DOCKER_COMPOSE_UP =docker-compose up -d
 DOCKER_COMPOSE_DOWN = $(DOCKER_COMPOSE) down
@@ -51,7 +51,7 @@ ifneq ("$(wildcard docker-compose-local.yml)","")
   DOCKER_COMPOSE_FILES := $(DOCKER_COMPOSE_FILES) -f docker-compose-local.yml
 endif
 
-# Create the .env file if it doesn't exist by copying the .env.dist file. ————————————————————————————
+# Create the ..env file if it doesn't exist by copying the ..env.dist file. ————————————————————————————
 .env:
 ifeq (,$(wildcard ./.env))
 	cp .env.dist .env

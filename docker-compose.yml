@@ -3,9 +3,10 @@ version: '3.3'
 services:
     php_apache:
 #        image: php:${PHP_VERSION}
-        build: docker
-#            context: .
-#            dockerfile: ./docker/Dockerfile
+#        build: docker
+        build: # Build the image from the Dockerfile in the current directory and give it a name.
+            context: ./docker
+            dockerfile: Dockerfile
         container_name: ${PROJECT_NAME}_php_apache
         restart: 'always'
         ports:
