@@ -13,7 +13,7 @@ DOCKER_COMPOSE_STOP = $(DOCKER_COMPOSE) stop
 DOCKER_COMPOSE_EXEC=$(DOCKER_COMPOSE) exec
 DOCKER_COMPOSE_RUN=$(DOCKER_COMPOSE) run
 # —— php, composer, symfony console ————————————————————————————
-DOCKER_COMPOSE_EXEC_PHP=$(DOCKER_COMPOSE_EXEC) php
+DOCKER_COMPOSE_EXEC_PHP=$(DOCKER_COMPOSE_EXEC) php_apache
 #COMPOSER=$(DOCKER_COMPOSE_EXEC_PHP) -d memory_limit=-1 /usr/local/bin/composer
 COMPOSER=$(DOCKER_COMPOSE_EXEC_PHP) -d memory_limit=-1 composer
 SYMFONY_CONSOLE=$(DOCKER_COMPOSE_EXEC_PHP) bin/console
@@ -84,8 +84,9 @@ reset: kill setup
 #start: update-permissions ## Start the project.
 #	$(DOCKER_COMPOSE_UP) --remove-orphans
 
-start: ## Start the project.
+start: update-permissions ## Start the project.
 	$(DOCKER_COMPOSE_UP) --remove-orphans
+	@$(call GREEN, "The application is available on http://localhost:8080")
 #	$(DOCKER_COMPOSE) exec -u 0 php sh -c "if [ -d /var/www/html/web/sites/default ]; then chmod -R a+w /var/www/html/web/sites/default; fi"
 #	$(DOCKER_COMPOSE) exec -u 0 php sh -c "if [ -d /var/cache ]; then chmod -R a+w /var/cache; fi"
 
@@ -150,7 +151,7 @@ cc-test: ## Clear the test environment cache
 	$(SYMFONY_CONSOLE) c:c --env=test
 
 cc-hard: ## Remove cache files
-	$(DOCKER_COMPOSE_EXEC_PHP) rm -fR var/cache/*
+	$(DOCKER_COMPOSE_EXEC_PHP) rm -fR project/var/cache/*
 
 clean-db: ## Re-initialize the database
 	- $(SYMFONY_CONSOLE) d:d:d --force --connection
@@ -168,34 +169,34 @@ clean-db-test: cc-hard cc-test ## Re-initialize the database in test environment
 
 ## —— Tests ———————————————————————————————————————————————————————————————
 test-unit: ## Launch unit tests
-	$(DOCKER_COMPOSE_EXEC_PHP) bin/phpunit tests/Unit/
+	$(DOCKER_COMPOSE_EXEC_PHP) project/bin/phpunit tests/Unit/
 
 test-func: clean-db-test	## Launch functional tests
-	$(DOCKER_COMPOSE_EXEC_PHP) bin/phpunit tests/Func/
+	$(DOCKER_COMPOSE_EXEC_PHP) project/bin/phpunit tests/Func/
 
 tests: test-func test-unit	## Launch all tests
 
 cs: ## Launch php code sniffer
-	$(DOCKER_COMPOSE_EXEC_PHP) vendor/bin/phpcs -n
+	$(DOCKER_COMPOSE_EXEC_PHP) project/vendor/bin/phpcs -n
 
 qa-cs-fixer-dry-run: ## Run php-cs-fixer in dry-run mode.
-	$(PHPQA_RUN) php-cs-fixer fix --rules=@Symfony --verbose --dry-run ./src
+	$(PHPQA_RUN) php-cs-fixer fix --rules=@Symfony --verbose --dry-run .project/src
 .PHONY: qa-cs-fixer-dry-run
 
 qa-cs-fixer: ## Run php-cs-fixer.
-	$(PHPQA_RUN) php-cs-fixer fix --rules=@Symfony --verbose ./src/Twig/AppExtension.php
+	$(PHPQA_RUN) php-cs-fixer fix --rules=@Symfony --verbose .project/src/Twig/AppExtension.php
 .PHONY: qa-cs-fixer
 
 qa-phpstan: ## Run phpstan.
-	$(PHPQA_RUN) phpstan analyse --level=0 ./src
+	$(PHPQA_RUN) phpstan analyse --level=0 .project/src
 .PHONY: qa-phpstan
 
 qa-rector-dry-run: ## Run rector.
-	$(PHPQA_RUN) rector process --dry-run ./src
+	$(PHPQA_RUN) rector process --dry-run .project/src
 .PHONY: qa-phpstan
 
 qa-rector: ## Run rector.
-	$(PHPQA_RUN) rector process ./src/Twig/AppExtension.php
+	$(PHPQA_RUN) rector process .project/src/Twig/AppExtension.php
 .PHONY: qa-phpstan
 
 qa-audit: ## Run composer audit.
