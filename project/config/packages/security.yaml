@@ -11,12 +11,33 @@ security:
                 property: email
     firewalls:
         dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            pattern:
+                - ^/_profiler/
+                - ^/_wdt/
+                - ^/css/
+                - ^/images/
+                - ^/js/
             security: false
         main:
             lazy: true
             provider: app_user_provider
+            login_link:
+                check_route: login_check
+                # Properties used to create a signed URL that uniquely identifies the user.
+                signature_properties: [ 'id', 'email' ]
+                # only allow the link to be used 3 times.
+                max_uses: 3
+                # Avoid email providers and browsers 'preview of the links' to be counted as ONE use.
+                check_post_only: true
+                # lifetime in seconds (300 seconds = 5 minutes).
+                lifetime: 60
 
+                # optionally, configure the cache pool.
+                #used_link_cache: 'cache.redis'
+            logout:
+                path: logout
+                # where to redirect after logout
+                # target: app_any_route
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
@@ -26,8 +47,9 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+    # - { path: ^/admin, roles: ROLE_ADMIN }
+     - { path: ^/login, roles: PUBLIC_ACCESS }
+     - { path: ^/home, roles: ROLE_USER }
 
 when@test:
     security:
