@@ -1,9 +1,10 @@
 version: '3.3'
 
 services:
+    # Open http://localhost:8000/ in your browser to see the Symfony welcome page.
     php:
-#        image: php:${PHP_VERSION}
-#        build: docker
+        #        image: php:${PHP_VERSION}
+        #        build: docker
         build: # Build the image from the Dockerfile in the current directory and give it a name.
             context: ./docker
             dockerfile: Dockerfile
@@ -47,27 +48,28 @@ services:
             MYSQL_USER: ${DATABASE_USER}
             MYSQL_PASSWORD: ${DATABASE_PASSWORD}
             MYSQL_NAME: ${DATABASE_NAME}
-#            MYSQL_DATABASE: ${DATABASE_NAME}
+        #            MYSQL_DATABASE: ${DATABASE_NAME}
         ports:
             - "3307:3306"
         expose:
             - 3306
 
-#    adminer:
-#        image: adminer:${ADMINER_VERSION}
-#        container_name: ${PROJECT_NAME}_adminer
-#        restart: always
-#        networks:
-#            - my-network
-#        depends_on:
-#            - database
-#        ports:
-#            - "8080:80"
-#        environment:
-#            PMA_HOST: database
-#            PMA_PORT: 3306
     #https://adminer.techtalk.docker.devhost/?server=mysql&username=root&db=techtalk
+    #    adminer:
+    #        image: adminer:${ADMINER_VERSION}
+    #        container_name: ${PROJECT_NAME}_adminer
+    #        restart: always
+    #        networks:
+    #            - my-network
+    #        depends_on:
+    #            - database
+    #        ports:
+    #            - "8080:80"
+    #        environment:
+    #            PMA_HOST: database
+    #            PMA_PORT: 3306
 
+    # Open http://localhost:8081/ in your browser to see the phpMyAdmin interface.
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         container_name: ${PROJECT_NAME}_phpmyadmin
@@ -81,9 +83,15 @@ services:
         depends_on:
             - database
 
+    # Open http://localhost:1080/ in your browser to see the emails.
     mailer:
         image: schickling/mailcatcher
-        ports: [ "1025", "1080" ]
+        container_name: ${PROJECT_NAME}_mailer
+        ports:
+            - "1025:1025"
+            - "1080:1080"
+        networks:
+            - my-network
 
 networks:
     my-network:

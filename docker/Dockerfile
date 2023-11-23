@@ -12,7 +12,7 @@ RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        locales git libicu-dev g++ libpng-dev libxml2-dev libzip-dev libonig-dev libxslt-dev unzip nodejs npm \
+        locales git libicu-dev g++ libpng-dev libxml2-dev libzip-dev libonig-dev libxslt-dev unzip nodejs npm telnet\
     && rm -rf /var/lib/apt/lists/*
 
 # Configuration des locales
@@ -32,7 +32,7 @@ RUN pecl install apcu && docker-php-ext-enable apcu
 
 # Installation des extensions PHP nécessaires (gd = gestionnaire d'images)
 RUN curl -sSL https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o - | sh -s \
-      gd xdebug pdo pdo_mysql intl zip
+      gd xdebug pdo pdo_mysql intl zip sodium xsl apcu
 
 # Définition du répertoire de travail
 WORKDIR /var/www/
