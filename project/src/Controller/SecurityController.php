@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Form\LoginCheckType;
 use App\Repository\UserRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,8 +19,11 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkNotification;
 
 class SecurityController extends AbstractController
 {
-    #[Route('/login', name: 'login')]
-    public function requestLoginLink(
+    private const EMAIL_STATUS_SUCCESS = 'success';
+    private const EMAIL_STATUS_FAILURE = 'failure';
+
+    #[Route('/login_link', name: 'login_link', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function loginLink(
         NotifierInterface $notifier,
         LoginLinkHandlerInterface $loginLinkHandler,
         UserRepository $userRepository,
@@ -38,25 +42,20 @@ class SecurityController extends AbstractController
             try {
                 // create a login link for $user this returns an instance of LoginLinkDetails
                 $loginLinkDetails = $loginLinkHandler->createLoginLink($user);
-            } catch (ExpiredLoginLinkException $e) {
-                return new Response('Login link has expired');
-            }
 
-            // create a notification based on the login link details
-            $notification = new LoginLinkNotification(
-                $loginLinkDetails,
-                'Link to connect to Techtalk website!' // email subject
-            );
-            // create a recipient for this user
-            $recipient = new Recipient($user->getEmail());
+                // create a notification based on the login link details
+                $notification = new LoginLinkNotification(
+                    $loginLinkDetails,
+                    'Link to connect to Techtalk website!' // email subject
+                );
+                // create a recipient for this user
+                $recipient = new Recipient($user->getEmail());
 
-//            $loginLink = $loginLinkDetails->getUrl();
-
-            try {
                 // send the notification to the user
                 $notifier->send($notification, $recipient);
+            } catch (ExpiredLoginLinkException $e) {
+                return new Response('Login link has expired');
             } catch (TransportExceptionInterface $e) {
-                // handle the exception and return a failure message
                 return new Response('Failed to send email');
             }
 
@@ -67,15 +66,59 @@ class SecurityController extends AbstractController
         }
 
         // if it's not submitted, render the "login" form
-        return $this->render('security/login.html.twig', [
+        return $this->render('security/login_link.html.twig', [
             'controller_name' => 'SecurityController',
         ]);
     }
 
+    #[Route('/login_links', name: 'login_links', methods: Request::METHOD_POST)]
+    public function loginLinks(NotifierInterface $notifier,
+        LoginLinkHandlerInterface $loginLinkHandler,
+        UserRepository $userRepository,
+        LoggerInterface $logger
+    ): Response {
+        $processedEmails = [];
+
+        foreach ($userRepository->findAll() as $user) {
+            $userEmail = $user->getEmail();
+
+            try {
+                // create a login link for $user this returns an instance of LoginLinkDetails
+                $loginLinkDetails = $loginLinkHandler->createLoginLink($user);
+
+                // create a notification based on the login link details
+                $notification = new LoginLinkNotification(
+                    $loginLinkDetails,
+                    'Link to connect to Techtalk website!' // email subject
+                );
+
+                // create a recipient for this user
+                $recipient = new Recipient($userEmail);
+
+                // send the notification to the user
+                $notifier->send($notification, $recipient);
+
+                // If the email is sent successfully, add it to the output array with a success status
+                $processedEmails[self::EMAIL_STATUS_SUCCESS][] = ['email' => $userEmail];
+            } catch (ExpiredLoginLinkException|TransportExceptionInterface $e) {
+                // If the link is expired or has a transport exception, log the error and add the email to the output array with a failure status
+                $logger->error(sprintf('Failed to send login link to %s: %s', $userEmail, $e->getMessage()));
+                $processedEmails[self::EMAIL_STATUS_FAILURE][] = ['email' => $userEmail, 'error' => $e->getMessage()];
+            }
+        }
+        // render a "Login link is sent!" page
+        return $this->render('security/login_links_sent.html.twig', [
+            'success_emails' => $processedEmails[self::EMAIL_STATUS_SUCCESS] ?? [],
+            'failure_emails' => $processedEmails[self::EMAIL_STATUS_FAILURE] ?? []
+        ]);
+    }
+
+
     /**
      * After clicking on the login link, the user is redirected to this route.
      */
-    #[Route('/login_check', name: 'login_check')]
+    #[
+        Route('/login_check', name: 'login_check')]
     public function check(Request $request): Response {
 
         $form = $this->createForm(LoginCheckType::class, [
