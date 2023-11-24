@@ -48,7 +48,7 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
     # - { path: ^/admin, roles: ROLE_ADMIN }
-     - { path: ^/login, roles: PUBLIC_ACCESS }
+     - { path: ^/login_link, roles: PUBLIC_ACCESS } # path which will be used by admin (ROLE_ADMIN)
      - { path: ^/home, roles: ROLE_USER }
 
 when@test:

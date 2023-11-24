@@ -13,12 +13,7 @@ class HomeController extends AbstractController
     #[Route('/home', name: 'home')]
     public function home(Request $request, Security $security): Response {
 
-        return $this->render(
-            'home/home.html.twig',
-            [
-                'user_email' => $security->getUser() ? $security->getUser()->getUserIdentifier() : $request->query->get('userEmail'),
-            ]
-        );
+        return $this->render('home/home.html.twig');
     }
 
     #[Route('/', name: 'index')]

@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login Links Sent{% endblock %}
+
+{% block body %}
+    <h1>Login Links Sent to many users</h1>
+    <p>A login link has been sent to the email addresses of those users.</p>
+    <h2>Successful emails:</h2>
+
+    <ul>
+        {% for success_email in success_emails %}
+            <li>{{ success_email.email }}</li>
+        {% endfor %}
+    </ul>
+
+    {% if failure_emails %}
+        <h2>Failed emails:</h2>
+        <ul>
+            {% for failure_email in failure_emails %}
+                <li>{{ failure_email.email }} - {{ failure_email.error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <p>They can now check their inbox and click on the link to log in.</p>
+{% endblock %}
