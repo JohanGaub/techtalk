@@ -37,7 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $LastName = null;
 
     #[ORM\Column(nullable: false)]
-    private ?bool $isEnabled = null;
+    private ?bool $enabled = null;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
@@ -124,12 +124,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isIsEnabled(): ?bool {
-        return $this->isEnabled;
+    public function isEnabled(): ?bool {
+        return $this->enabled;
     }
 
-    public function setIsEnabled(?bool $isEnabled): self {
-        $this->isEnabled = $isEnabled;
+    public function setEnabled(?bool $enabled): self {
+        $this->enabled = $enabled;
 
         return $this;
     }
