@@ -1,14 +1,9 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Process login link{% endblock %}
+
 {% block body %}
     <h2>Hi! You are about to login to Techtalk...</h2>
-
-    {#    <form action="{{ path('login_check') }}" method="POST"> #}
-    {#        <input type="hidden" name="expires" value="{{ expires }}"> #}
-    {#        <input type="hidden" name="user" value="{{ user_email }}"> #}
-    {#        <input type="hidden" name="hash" value="{{ hash }}"> #}
-    {#        <input type="submit" value="Continue"> #}
-    {#    </form> #}
 
     {{ form_start(form) }}
     {{ form_row(form.expires) }}

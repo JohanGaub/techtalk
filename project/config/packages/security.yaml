@@ -30,26 +30,26 @@ security:
                 # Avoid email providers and browsers 'preview of the links' to be counted as ONE use.
                 check_post_only: true
                 # lifetime in seconds (300 seconds = 5 minutes).
-                lifetime: 60
+                lifetime: 300
 
                 # optionally, configure the cache pool.
                 #used_link_cache: 'cache.redis'
             logout:
                 path: logout
                 # where to redirect after logout
-                # target: app_any_route
+                target: login_link
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
             # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+            switch_user: true
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-    # - { path: ^/admin, roles: ROLE_ADMIN }
-     - { path: ^/login_link, roles: PUBLIC_ACCESS } # path which will be used by admin (ROLE_ADMIN)
+     - { path: ^/login_link, roles: PUBLIC_ACCESS }
      - { path: ^/home, roles: ROLE_USER }
+     - { path: ^/admin, roles: ROLE_ADMIN }
 
 when@test:
     security:
