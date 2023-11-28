@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Upload users{% endblock %}
+
+{% block body %}
+    <h2>You are about to upload users to Techtalk!</h2>
+
+    {{ form_start(upload_form) }}
+    {{ form_row(upload_form.users) }}
+    {{ form_end(upload_form) }}
+{% endblock %}
+

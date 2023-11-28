@@ -3,9 +3,13 @@
 namespace App\Controller;
 
 use App\Form\LoginCheckType;
+use App\Form\UserFileType;
 use App\Repository\UserRepository;
+use App\Service\FileUploader;
+use App\Service\UserService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -19,8 +23,8 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkNotification;
 
 class SecurityController extends AbstractController
 {
-    private const EMAIL_STATUS_SUCCESS = 'success';
-    private const EMAIL_STATUS_FAILURE = 'failure';
+    private const STATUS_SUCCESS = 'success';
+    private const STATUS_FAILURE = 'failure';
 
     #[Route('/login_link', name: 'login_link', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function loginLink(
@@ -31,7 +35,6 @@ class SecurityController extends AbstractController
     ): Response {
         // check if login form is submitted
         if ($request->isMethod(Request::METHOD_POST)) {
-            // load the user in some way (e.g. using the form input)
             $email = $request->request->get('email');
             $user = $userRepository->findOneBy(['email' => $email]);
 
@@ -48,8 +51,10 @@ class SecurityController extends AbstractController
                     $loginLinkDetails,
                     'Link to connect to Techtalk website!' // email subject
                 );
+
                 // create a recipient for this user
-                $recipient = new Recipient($user->getEmail());
+                $userEmail = $user->getEmail();
+                $recipient = new Recipient($userEmail);
 
                 // send the notification to the user
                 $notifier->send($notification, $recipient);
@@ -61,64 +66,74 @@ class SecurityController extends AbstractController
 
             // render a "Login link is sent!" page
             return $this->render('security/login_link_sent.html.twig', [
-                'user_email' => $user->getEmail(),
+                'user_email' => $userEmail,
             ]);
         }
 
         // if it's not submitted, render the "login" form
         return $this->render('security/login_link.html.twig', [
-            'controller_name' => 'SecurityController',
+            'controller_name' => self::class,
+            // créer les formulaires en php pour cette page et les ajouter ici.
         ]);
     }
 
-    #[Route('/login_links', name: 'login_links', methods: Request::METHOD_POST)]
-    public function loginLinks(NotifierInterface $notifier,
+    #[Route('/login_links', name: 'login_links', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function loginLinks(
+        NotifierInterface $notifier,
         LoginLinkHandlerInterface $loginLinkHandler,
         UserRepository $userRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Request $request
     ): Response {
         $processedEmails = [];
 
-        foreach ($userRepository->findAll() as $user) {
-            $userEmail = $user->getEmail();
+        if ($request->isMethod(Request::METHOD_POST)) {
+            foreach ($userRepository->findAll() as $user) {
+                try {
+                    // create a login link for $user this returns an instance of LoginLinkDetails
+                    $loginLinkDetails = $loginLinkHandler->createLoginLink($user);
 
-            try {
-                // create a login link for $user this returns an instance of LoginLinkDetails
-                $loginLinkDetails = $loginLinkHandler->createLoginLink($user);
+                    // create a notification based on the login link details
+                    $notification = new LoginLinkNotification(
+                        $loginLinkDetails,
+                        'Link to connect to Techtalk website!' // email subject
+                    );
 
-                // create a notification based on the login link details
-                $notification = new LoginLinkNotification(
-                    $loginLinkDetails,
-                    'Link to connect to Techtalk website!' // email subject
-                );
+                    // create a recipient for this user
+                    $userEmail = $user->getEmail();
+                    $recipient = new Recipient($userEmail);
 
-                // create a recipient for this user
-                $recipient = new Recipient($userEmail);
+                    // send the notification to the user
+                    $notifier->send($notification, $recipient);
 
-                // send the notification to the user
-                $notifier->send($notification, $recipient);
-
-                // If the email is sent successfully, add it to the output array with a success status
-                $processedEmails[self::EMAIL_STATUS_SUCCESS][] = ['email' => $userEmail];
-            } catch (ExpiredLoginLinkException|TransportExceptionInterface $e) {
-                // If the link is expired or has a transport exception, log the error and add the email to the output array with a failure status
-                $logger->error(sprintf('Failed to send login link to %s: %s', $userEmail, $e->getMessage()));
-                $processedEmails[self::EMAIL_STATUS_FAILURE][] = ['email' => $userEmail, 'error' => $e->getMessage()];
+                    // If the email is sent successfully, add it to the output array with a success status
+                    $processedEmails[self::STATUS_SUCCESS][] = ['email' => $userEmail];
+                } catch (ExpiredLoginLinkException|TransportExceptionInterface $e) {
+                    // If the link is expired or has a transport exception, log the error and add the email to the output array with a failure status
+                    $logger->error(sprintf('Failed to send login link to %s: %s', $userEmail, $e->getMessage()));
+                    $processedEmails[self::STATUS_FAILURE][] = ['email' => $userEmail, 'error' => $e->getMessage()];
+                }
             }
+
+            // render a "Login link is sent!" page
+            return $this->render('security/login_links_sent.html.twig', [
+                self::STATUS_SUCCESS => $processedEmails[self::STATUS_SUCCESS] ?? [],
+                self::STATUS_FAILURE => $processedEmails[self::STATUS_FAILURE] ?? [],
+                'total_success' => count($processedEmails[self::STATUS_SUCCESS] ?? []),
+                'total_failure' => count($processedEmails[self::STATUS_FAILURE] ?? []),
+            ]);
         }
+
         // render a "Login link is sent!" page
-        return $this->render('security/login_links_sent.html.twig', [
-            'success_emails' => $processedEmails[self::EMAIL_STATUS_SUCCESS] ?? [],
-            'failure_emails' => $processedEmails[self::EMAIL_STATUS_FAILURE] ?? []
+        return $this->render('security/login_links.html.twig', [
+            'controller_name' => self::class,
         ]);
     }
-
 
     /**
      * After clicking on the login link, the user is redirected to this route.
      */
-    #[
-        Route('/login_check', name: 'login_check')]
+    #[Route('/login_check', name: 'login_check')]
     public function check(Request $request): Response {
 
         $form = $this->createForm(LoginCheckType::class, [
@@ -128,9 +143,43 @@ class SecurityController extends AbstractController
         ]);
 
         // render a template with the button
-        // SF 6.2 : render() method calls $form->createView() to transform the form into a form view instance.
+        // see https://symfony.com/doc/current/forms.html#rendering-forms : from SF 6.2, render() method calls $form->createView() to transform the form into a form view instance.
         return $this->render('security/process_login_link.html.twig', [
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/upload_users', name: 'upload_users', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function uploadUsers(
+        Request $request,
+        FileUploader $fileUploaderService,
+        UserService $userService
+    ): Response {
+        $form = $this->createForm(UserFileType::class);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $usersFile */
+            $usersFile = $form->get('users')->getData();
+            if ($usersFile) {
+                $fileName = $fileUploaderService->upload($usersFile);
+                // Add users from the file inside the database.
+                $uploadResults = $userService->addUsers($fileName);
+            }
+
+            return $this->render('security/login_links.html.twig', [
+                'upload_users_output' => $fileName ?? [],
+                'controller_name' => self::class,
+                'upload_results' => $uploadResults ?? [],
+//                'success_uploads' => $processedUploads[self::EMAIL_STATUS_SUCCESS] ?? [],
+//                'failure_uploads' => $processedUploads[self::EMAIL_STATUS_FAILURE] ?? []
+            ]);
+        }
+
+        // see https://symfony.com/doc/current/forms.html#rendering-forms : from SF 6.2, render() method calls $form->createView() to transform the form into a form view instance.
+        return $this->render('security/upload_users.html.twig', [
+            'upload_form' => $form,
         ]);
     }
 
