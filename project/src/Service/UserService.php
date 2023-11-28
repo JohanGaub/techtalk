@@ -42,13 +42,15 @@ class UserService
                 // Indeed, we use the login link feature to connect to the website.
                 $user->setPassword(password_hash('default_password', PASSWORD_BCRYPT));
                 $this->entityManager->persist($user);
-                $success++;
+                ++$success;
 
             } catch (\Exception $e) {
-                $failure++;
+                ++$failure;
             }
-            $total++;
+
+            ++$total;
         }
+
         fclose($openCsv);
         $this->entityManager->flush();
 

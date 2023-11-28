@@ -24,6 +24,7 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkNotification;
 class SecurityController extends AbstractController
 {
     private const STATUS_SUCCESS = 'success';
+
     private const STATUS_FAILURE = 'failure';
 
     #[Route('/login_link', name: 'login_link', methods: [Request::METHOD_GET, Request::METHOD_POST])]
@@ -38,7 +39,7 @@ class SecurityController extends AbstractController
             $email = $request->request->get('email');
             $user = $userRepository->findOneBy(['email' => $email]);
 
-            if (!$user) {
+            if (null === $user) {
                 throw new UserNotFoundException('User not found');
             }
 
@@ -189,6 +190,6 @@ class SecurityController extends AbstractController
     #[Route('/logout', name: 'logout', methods: ['GET'])]
     public function logout(): never {
         // controller can be blank: it will never be called!
-        throw new \Exception('Don\'t forget to activate logout in security.yaml');
+        throw new \Exception("Don't forget to activate logout in security.yaml");
     }
 }

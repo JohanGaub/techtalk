@@ -66,11 +66,9 @@ class Agency
 
     public function removeUser(User $user): static
     {
-        if ($this->users->removeElement($user)) {
-            // set the owning side to null (unless already changed)
-            if ($user->getAgency() === $this) {
-                $user->setAgency(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->users->removeElement($user) && $user->getAgency() === $this) {
+            $user->setAgency(null);
         }
 
         return $this;
