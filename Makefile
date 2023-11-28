@@ -196,7 +196,7 @@ qa-rector-dry-run: ## Run rector.
 .PHONY: qa-phpstan
 
 qa-rector: ## Run rector.
-	$(PHPQA_RUN) rector process .project/src/Twig/AppExtension.php
+	$(PHPQA_RUN) rector process ./project/src
 .PHONY: qa-phpstan
 
 qa-audit: ## Run composer audit.
