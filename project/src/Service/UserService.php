@@ -16,7 +16,8 @@ class UserService
     ) {
     }
 
-    public function addUsers($fileName): array {
+    public function addUsers($fileName): array
+    {
 
         $openCsv = fopen(sprintf('%s/%s', $this->userDirectory, $fileName), "r");
 
@@ -32,7 +33,7 @@ class UserService
             try {
                 $user = new User();
                 $user->setEmail(uniqid('user_') . '@gmail.com');
-//            $user->setEmail($data[0]); // use it when we want to use every role
+                //            $user->setEmail($data[0]); // use it when we want to use every role
                 $user->setFirstName($data[1]);
                 $user->setLastName($data[2]);
                 $user->setRoles(explode(",", $data[3]));
@@ -64,10 +65,11 @@ class UserService
         //6) Renvoyer le nombre d'utilisateurs ajoutés
         //7) Renvoyer le nombre d'utilisateurs échoués
         //8) Afficher ces informations dans une page twig
-//        $users, $success, $failure, $total
+        //        $users, $success, $failure, $total
     }
 
-    private function getAgencyById($id): ?Agency {
+    private function getAgencyById($id): ?Agency
+    {
         return $this->agencyRepository->find($id);
     }
 }

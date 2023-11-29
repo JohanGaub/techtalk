@@ -19,7 +19,8 @@ class FileUploader
     /**
      * @see https://symfony.com/doc/current/controller/upload_file.html
      */
-    public function upload(UploadedFile $file): string {
+    public function upload(UploadedFile $file): string
+    {
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $safeFilename = $this->slugger->slug($originalFilename);
         $fileName = sprintf('%s-%s.%s', $safeFilename, uniqid(), $file->guessExtension());
@@ -28,7 +29,7 @@ class FileUploader
             $file->move($this->userDirectory, $fileName);
         } catch (FileException $fileException) {
             $this->logger->error(sprintf('Failed to upload file %s: %s', $fileName, $fileException->getMessage()));
-//            TODO: save errors in a variable OUTPUT AND, in the controller, use addFlashmessage to show errors.
+            //            TODO: save errors in a variable OUTPUT AND, in the controller, use addFlashmessage to show errors.
         }
 
         return $fileName;

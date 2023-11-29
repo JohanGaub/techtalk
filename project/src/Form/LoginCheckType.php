@@ -9,7 +9,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class LoginCheckType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options): void {
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
         $builder
             ->add('expires', HiddenType::class)
             ->add('user_email', HiddenType::class)
