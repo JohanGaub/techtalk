@@ -11,13 +11,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class HomeController extends AbstractController
 {
     #[Route('/home', name: 'home')]
-    public function home(Security $security): Response {
+    public function home(Security $security): Response
+    {
 
         return $this->render('home/home.html.twig');
     }
 
     #[Route('/', name: 'index')]
-    public function index() : Response
+    public function index(): Response
     {
         return $this->redirectToRoute('home');
     }

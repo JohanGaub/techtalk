@@ -10,7 +10,8 @@ use Symfony\Component\Validator\Constraints\File;
 
 class UserFileType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options): void {
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
         $builder
             ->add('users', FileType::class, [
                 'label' => 'Select users file you want to upload',
@@ -28,7 +29,10 @@ class UserFileType extends AbstractType
                     ])
                 ],
             ])
-            ->add('submit', SubmitType::class, [
+            ->add(
+                'submit',
+                SubmitType::class,
+                [
                     'label' => 'Upload',
                 ]
             );

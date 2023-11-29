@@ -135,8 +135,8 @@ class SecurityController extends AbstractController
      * After clicking on the login link, the user is redirected to this route.
      */
     #[Route('/login_check', name: 'login_check')]
-    public function check(Request $request): Response {
-
+    public function check(Request $request): Response
+    {
         $form = $this->createForm(LoginCheckType::class, [
             "expires" => $request->query->get('expires'),
             "user_email" => $request->query->get('user'),
@@ -188,7 +188,8 @@ class SecurityController extends AbstractController
      * @throws \Exception
      */
     #[Route('/logout', name: 'logout', methods: ['GET'])]
-    public function logout(): never {
+    public function logout(): never
+    {
         // controller can be blank: it will never be called!
         throw new \Exception("Don't forget to activate logout in security.yaml");
     }
