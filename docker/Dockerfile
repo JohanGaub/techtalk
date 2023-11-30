@@ -12,7 +12,7 @@ RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        locales git libicu-dev g++ libpng-dev libxml2-dev libzip-dev libonig-dev libxslt-dev unzip nodejs npm telnet\
+        locales git libicu-dev g++ libpng-dev libxml2-dev libzip-dev libonig-dev libxslt-dev unzip nodejs npm telnet yarn\
     && rm -rf /var/lib/apt/lists/*
 
 # Configuration des locales
@@ -34,8 +34,35 @@ RUN pecl install apcu && docker-php-ext-enable apcu
 RUN curl -sSL https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o - | sh -s \
       gd xdebug pdo pdo_mysql intl zip sodium xsl apcu
 
+
+## Installation de Node.js
+#RUN curl -fsSL https://deb.nodesource.com/setup_21.x | bash - \
+#    && apt-get install -y nodejs
+#
+## Vérification de l'installation
+#RUN node --version
+#RUN npm --version
+
+# Set npm cache directory to a directory in the current user's home directory
+ENV npm_config_cache=/var/www/project/.npm
+
 # Définition du répertoire de travail
-WORKDIR /var/www/
+WORKDIR /var/www/project/
+
+# Installation de Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
+# Mise à jour de npm à la dernière version
+RUN npm install -g npm@latest
+RUN npm install sass-loader node-sass --save-dev
+RUN npm install jquery @popperjs/core --save-dev
+RUN npm install bootstrap --save-dev
+RUN npm install moment --save
+
+# Vérification de l'installation
+RUN node --version
+RUN npm --version
 
 # Configuration pour utiliser l'utilisateur www-data
 USER www-data

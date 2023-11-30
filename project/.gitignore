@@ -14,11 +14,6 @@
 .phpunit.result.cache
 ###< phpunit/phpunit ###
 
-###> symfony/phpunit-bridge ###
-.phpunit.result.cache
-/phpunit.xml
-###< symfony/phpunit-bridge ###
-
 ###> phpstan/phpstan ###
 phpstan.neon
 ###< phpstan/phpstan ###
@@ -27,3 +22,22 @@ phpstan.neon
 /tools/
 /.php-cs-fixer.cache
 ###> php-cs-fixer ###
+
+###> symfony/webpack-encore-bundle ###
+/node_modules/
+/public/build/
+npm-debug.log
+yarn-error.log
+/.npm
+###< symfony/webpack-encore-bundle ###
+
+
+###> template ###
+/templates/new_templates
+/templates/example_templates
+/assets/css
+/assets/img
+/assets/js
+/assets/lib
+/assets/scss
+###< template ###
