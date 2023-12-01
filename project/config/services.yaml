@@ -29,3 +29,7 @@ services:
     App\Service\UserService:
         arguments:
             $userDirectory: '%user_directory%'
+
+    App\EventListener\LoginRedirectListener:
+        arguments:
+            - '@router'

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Form\LoginCheckType;
@@ -187,7 +189,7 @@ class SecurityController extends AbstractController
     /**
      * @throws \Exception
      */
-    #[Route('/logout', name: 'logout', methods: ['GET'])]
+    #[Route('/logout', name: 'logout', methods: [Request::METHOD_GET])]
     public function logout(): never
     {
         // controller can be blank: it will never be called!

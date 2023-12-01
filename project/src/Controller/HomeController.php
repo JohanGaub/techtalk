@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,7 +16,9 @@ class HomeController extends AbstractController
     public function home(Security $security): Response
     {
 
-        return $this->render('home/home.html.twig');
+        return $this->render('home/home.html.twig', [
+            'controller_name' => self::class,
+        ]);
     }
 
     #[Route('/', name: 'index')]
