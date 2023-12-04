@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -43,6 +45,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(nullable: false)]
     private ?Agency $agency = null;
 
+    #[ORM\OneToMany(mappedBy: 'userProposerId', targetEntity: Topic::class)]
+    private Collection $proposedTopics;
+
+    #[ORM\OneToMany(mappedBy: 'userValidatorId', targetEntity: Topic::class)]
+    private Collection $validatedTopics;
+
+    #[ORM\OneToMany(mappedBy: 'userPresenterId', targetEntity: Topic::class)]
+    private Collection $presentedTopics;
+
+    public function __construct()
+    {
+        $this->proposedTopics = new ArrayCollection();
+        $this->validatedTopics = new ArrayCollection();
+        $this->presentedTopics = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -53,7 +71,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function setEmail(string $email): static
+    public function setEmail(string $email): self
     {
         $this->email = $email;
 
@@ -82,7 +100,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
-    public function setRoles(array $roles): static
+    public function setRoles(array $roles): self
     {
         $this->roles = $roles;
 
@@ -97,7 +115,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): static
+    public function setPassword(string $password): self
     {
         $this->password = $password;
 
@@ -157,6 +175,90 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setAgency(?Agency $agency): self
     {
         $this->agency = $agency;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Topic>
+     */
+    public function getProposedTopics(): Collection
+    {
+        return $this->proposedTopics;
+    }
+
+    public function addProposedTopic(Topic $proposedTopic): self
+    {
+        if (!$this->proposedTopics->contains($proposedTopic)) {
+            $this->proposedTopics->add($proposedTopic);
+            $proposedTopic->setUserProposer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProposedTopic(Topic $proposedTopic): self
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->proposedTopics->removeElement($proposedTopic) && $proposedTopic->getUserProposer() === $this) {
+            $proposedTopic->setUserProposer(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Topic>
+     */
+    public function getValidatedTopics(): Collection
+    {
+        return $this->validatedTopics;
+    }
+
+    public function addValidatedTopic(Topic $validatedTopic): self
+    {
+        if (!$this->validatedTopics->contains($validatedTopic)) {
+            $this->validatedTopics->add($validatedTopic);
+            $validatedTopic->setUserValidator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeValidatedTopic(Topic $validatedTopic): self
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->validatedTopics->removeElement($validatedTopic) && $validatedTopic->getUserValidator() === $this) {
+            $validatedTopic->setUserValidator(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Topic>
+     */
+    public function getPresentedTopics(): Collection
+    {
+        return $this->presentedTopics;
+    }
+
+    public function addPresentedTopic(Topic $presentedTopic): self
+    {
+        if (!$this->presentedTopics->contains($presentedTopic)) {
+            $this->presentedTopics->add($presentedTopic);
+            $presentedTopic->setUserPresenter($this);
+        }
+
+        return $this;
+    }
+
+    public function removePresentedTopic(Topic $presentedTopic): self
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->presentedTopics->removeElement($presentedTopic) && $presentedTopic->getUserPresenter() === $this) {
+            $presentedTopic->setUserPresenter(null);
+        }
 
         return $this;
     }
