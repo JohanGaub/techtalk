@@ -33,3 +33,7 @@ services:
     App\EventListener\LoginRedirectListener:
         arguments:
             - '@router'
+
+    App\EventListener\TopicReviewSubscriber:
+        tags:
+            - { name: 'kernel.event_subscriber' }

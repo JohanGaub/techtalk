@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\AgencyRepository;
@@ -24,9 +26,13 @@ class Agency
     #[ORM\OneToMany(mappedBy: 'agency', targetEntity: User::class)]
     private Collection $users;
 
+    #[ORM\OneToMany(mappedBy: 'agency', targetEntity: Meetup::class)]
+    private Collection $meetups;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->meetups = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -39,7 +45,7 @@ class Agency
         return $this->label;
     }
 
-    public function setLabel(string $label): static
+    public function setLabel(string $label): self
     {
         $this->label = $label;
 
@@ -54,7 +60,7 @@ class Agency
         return $this->users;
     }
 
-    public function addUser(User $user): static
+    public function addUser(User $user): self
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
@@ -64,11 +70,39 @@ class Agency
         return $this;
     }
 
-    public function removeUser(User $user): static
+    public function removeUser(User $user): self
     {
         // set the owning side to null (unless already changed)
         if ($this->users->removeElement($user) && $user->getAgency() === $this) {
             $user->setAgency(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Meetup>
+     */
+    public function getMeetups(): Collection
+    {
+        return $this->meetups;
+    }
+
+    public function addMeetup(Meetup $meetup): self
+    {
+        if (!$this->meetups->contains($meetup)) {
+            $this->meetups->add($meetup);
+            $meetup->setAgency($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMeetup(Meetup $meetup): self
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->meetups->removeElement($meetup) && $meetup->getAgency() === $this) {
+            $meetup->setAgency(null);
         }
 
         return $this;

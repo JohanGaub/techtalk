@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\UserRepository;
@@ -45,20 +47,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(nullable: false)]
     private ?Agency $agency = null;
 
-    #[ORM\OneToMany(mappedBy: 'userProposerId', targetEntity: Topic::class)]
+    #[ORM\OneToMany(mappedBy: 'userProposer', targetEntity: Topic::class)]
     private Collection $proposedTopics;
 
-    #[ORM\OneToMany(mappedBy: 'userValidatorId', targetEntity: Topic::class)]
-    private Collection $validatedTopics;
+    #[ORM\OneToMany(mappedBy: 'userReviewer', targetEntity: Topic::class)]
+    private Collection $reviewedTopics;
 
-    #[ORM\OneToMany(mappedBy: 'userPresenterId', targetEntity: Topic::class)]
+    #[ORM\OneToMany(mappedBy: 'userPresenter', targetEntity: Topic::class)]
     private Collection $presentedTopics;
+
+    /**
+     * If a user is removed, all their votes should be removed as well. That's why we use orphanRemoval: true.
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserTopicVote::class, orphanRemoval: true)]
+    private Collection $userTopicVotes;
+
+    #[ORM\OneToMany(mappedBy: 'organizer', targetEntity: Meetup::class)]
+    private Collection $meetups;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: MeetupUserParticipant::class)]
+    private Collection $meetupUserParticipants;
 
     public function __construct()
     {
         $this->proposedTopics = new ArrayCollection();
-        $this->validatedTopics = new ArrayCollection();
+        $this->reviewedTopics = new ArrayCollection();
         $this->presentedTopics = new ArrayCollection();
+        $this->userTopicVotes = new ArrayCollection();
+        $this->meetups = new ArrayCollection();
+        $this->meetupUserParticipants = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -210,26 +227,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Topic>
      */
-    public function getValidatedTopics(): Collection
+    public function getReviewedTopics(): Collection
     {
-        return $this->validatedTopics;
+        return $this->reviewedTopics;
     }
 
-    public function addValidatedTopic(Topic $validatedTopic): self
+    public function addReviewedTopic(Topic $reviewedTopic): self
     {
-        if (!$this->validatedTopics->contains($validatedTopic)) {
-            $this->validatedTopics->add($validatedTopic);
-            $validatedTopic->setUserValidator($this);
+        if (!$this->reviewedTopics->contains($reviewedTopic)) {
+            $this->reviewedTopics->add($reviewedTopic);
+            $reviewedTopic->setUserReviewer($this);
         }
 
         return $this;
     }
 
-    public function removeValidatedTopic(Topic $validatedTopic): self
+    public function removeReviewedTopic(Topic $reviewedTopic): self
     {
         // set the owning side to null (unless already changed)
-        if ($this->validatedTopics->removeElement($validatedTopic) && $validatedTopic->getUserValidator() === $this) {
-            $validatedTopic->setUserValidator(null);
+        if ($this->reviewedTopics->removeElement($reviewedTopic) && $reviewedTopic->getUserReviewer() === $this) {
+            $reviewedTopic->setUserReviewer(null);
         }
 
         return $this;
@@ -258,6 +275,90 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // set the owning side to null (unless already changed)
         if ($this->presentedTopics->removeElement($presentedTopic) && $presentedTopic->getUserPresenter() === $this) {
             $presentedTopic->setUserPresenter(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserTopicVote>
+     */
+    public function getUserTopicVotes(): Collection
+    {
+        return $this->userTopicVotes;
+    }
+
+    public function addUserTopicVote(UserTopicVote $userTopicVote): self
+    {
+        if (!$this->userTopicVotes->contains($userTopicVote)) {
+            $this->userTopicVotes->add($userTopicVote);
+            $userTopicVote->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserTopicVote(UserTopicVote $userTopicVote): self
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->userTopicVotes->removeElement($userTopicVote) && $userTopicVote->getUser() === $this) {
+            $userTopicVote->setUser(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Meetup>
+     */
+    public function getMeetups(): Collection
+    {
+        return $this->meetups;
+    }
+
+    public function addMeetup(Meetup $meetup): self
+    {
+        if (!$this->meetups->contains($meetup)) {
+            $this->meetups->add($meetup);
+            $meetup->setOrganizer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMeetup(Meetup $meetup): self
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->meetups->removeElement($meetup) && $meetup->getOrganizer() === $this) {
+            $meetup->setOrganizer(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MeetupUserParticipant>
+     */
+    public function getMeetupUserParticipants(): Collection
+    {
+        return $this->meetupUserParticipants;
+    }
+
+    public function addUserMeetup(MeetupUserParticipant $userMeetup): static
+    {
+        if (!$this->meetupUserParticipants->contains($userMeetup)) {
+            $this->meetupUserParticipants->add($userMeetup);
+            $userMeetup->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMeetupUserParticipant(MeetupUserParticipant $meetupUserParticipant): static
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->meetupUserParticipants->removeElement($meetupUserParticipant) && $meetupUserParticipant->getUser() === $this) {
+            $meetupUserParticipant->setUser(null);
         }
 
         return $this;
