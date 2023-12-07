@@ -9,22 +9,27 @@ framework:
                 property: 'currentPlace'
             supports:
                 - App\Entity\Topic
-            initial_marking: draft
+            initial_marking: '%current_place_draft%'
             places:
-                - draft
-                - reviewed
-                - rejected
-                - published
+                - '%current_place_draft%'
+                - '%current_place_reviewed%'
+                #                - '%current_place_rejected%'
+                - '%current_place_published%'
             transitions:
-                to_review:
+                ask_for_review:
+                    guard: "is_granted('ROLE_USER')"
+                    from: '%current_place_draft%'
+                    to: '%current_place_reviewed%'
+                reject_to_draft:
                     guard: "is_granted('ROLE_BOARD_USER')"
-                    from: draft
-                    to: reviewed
+                    from: '%current_place_reviewed%'
+                    #                    to: '%current_place_rejected%'
+                    to: '%current_place_draft%'
                 publish:
-                    guard: "is_authenticated"
-                    from: reviewed
-                    to: published
-                reject:
                     guard: "is_granted('ROLE_BOARD_USER')"
-                    from: reviewed
-                    to: rejected
+                    from: '%current_place_reviewed%'
+                    to: '%current_place_published%'
+                roll_back_to_review:
+                    guard: "is_granted('ROLE_BOARD_USER')"
+                    from: '%current_place_published%'
+                    to: '%current_place_reviewed%'
