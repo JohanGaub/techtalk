@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Topic;
-use App\Enum\CurrentPlace;
 use App\Form\TopicType;
-use App\Repository\TopicRepository;
 use App\Service\TopicService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,14 +21,14 @@ class TopicController extends AbstractController
     public function __construct(
         #[Target('topic_publishing')]
         private readonly WorkflowInterface $workflow,
-        private readonly TopicService $topicService
+        private readonly EntityManagerInterface $entityManager
     ) {
     }
 
     #[Route('/', name: 'topic_index', methods: [Request::METHOD_GET])]
-    public function index(TopicRepository $topicRepository): Response
+    public function index(TopicService $topicService): Response
     {
-        $topics = $this->topicService->getTopics($this->getUser()->getRoles());
+        $topics = $topicService->getTopics($this->getUser()->getRoles());
 
         return $this->render('topic/index.html.twig', [
             'topics' => $topics,
@@ -38,7 +36,7 @@ class TopicController extends AbstractController
     }
 
     #[Route('/create', name: 'topic_create', methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request): Response
     {
         $topic = new Topic();
 
@@ -48,8 +46,8 @@ class TopicController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $topic->setUserProposer($this->getUser());
             $this->workflow->getMarking($topic);
-            $entityManager->persist($topic);
-            $entityManager->flush();
+            $this->entityManager->persist($topic);
+            $this->entityManager->flush();
 
             return $this->redirectToRoute('topic_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -69,13 +67,13 @@ class TopicController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'topic_edit', methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function edit(Request $request, Topic $topic, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Topic $topic): Response
     {
         $form = $this->createForm(TopicType::class, $topic);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            $this->entityManager->flush();
 
             return $this->redirectToRoute('topic_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -87,11 +85,11 @@ class TopicController extends AbstractController
     }
 
     #[Route('/{id}', name: 'topic_delete', methods: [Request::METHOD_POST])]
-    public function delete(Request $request, Topic $topic, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Topic $topic): Response
     {
         if ($this->isCsrfTokenValid('delete' . $topic->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($topic);
-            $entityManager->flush();
+            $this->entityManager->remove($topic);
+            $this->entityManager->flush();
         }
 
         return $this->redirectToRoute('topic_index', [], Response::HTTP_SEE_OTHER);
@@ -102,11 +100,11 @@ class TopicController extends AbstractController
      * We're passing from "reviewed" to "draft" current place.
      */
     #[Route('/{id}/reject-to-draft', name: 'topic_reject_to_draft', methods: [Request::METHOD_POST])]
-    public function rejectedToDraft(Request $request, Topic $topic, EntityManagerInterface $entityManager): Response
+    public function rejectedToDraft(Request $request, Topic $topic): Response
     {
         if ($this->isCsrfTokenValid('reject_to_draft' . $topic->getId(), $request->request->get('_token'))) {
             $this->workflow->apply($topic, 'reject_to_draft');
-            $entityManager->flush();
+            $this->entityManager->flush();
         }
 
         return $this->redirectToRoute('topic_index', [], Response::HTTP_SEE_OTHER);
@@ -117,12 +115,11 @@ class TopicController extends AbstractController
      * We're passing from "draft" to "reviewed" current place.
      */
     #[Route('/{id}/ask-for-review', name: 'topic_ask_for_review', methods: [Request::METHOD_POST])]
-    public function askForReview(Request $request, Topic $topic, EntityManagerInterface $entityManager): Response
+    public function askForReview(Request $request, Topic $topic): Response
     {
         if ($this->isCsrfTokenValid('ask_for_review' . $topic->getId(), $request->request->get('_token'))) {
             $this->workflow->apply($topic, 'ask_for_review');
-
-            $entityManager->flush();
+            $this->entityManager->flush();
         }
 
         return $this->redirectToRoute('topic_index', [], Response::HTTP_SEE_OTHER);
@@ -133,11 +130,11 @@ class TopicController extends AbstractController
      * We're passing from "reviewed" to "published" current place.
      */
     #[Route('/{id}/publish', name: 'topic_publish', methods: [Request::METHOD_POST])]
-    public function publish(Request $request, Topic $topic, EntityManagerInterface $entityManager): Response
+    public function publish(Request $request, Topic $topic): Response
     {
         if ($this->isCsrfTokenValid('publish' . $topic->getId(), $request->request->get('_token'))) {
             $this->workflow->apply($topic, 'publish');
-            $entityManager->flush();
+            $this->entityManager->flush();
         }
 
         return $this->redirectToRoute('topic_index', [], Response::HTTP_SEE_OTHER);
@@ -148,12 +145,11 @@ class TopicController extends AbstractController
      * We're rolling back from "published" to "reviewed" current place.
      */
     #[Route('/{id}/roll-back-to-review', name: 'topic_roll_back_to_review', methods: [Request::METHOD_POST])]
-    public function goBackToReview(Request $request, Topic $topic, EntityManagerInterface $entityManager): Response
+    public function goBackToReview(Request $request, Topic $topic): Response
     {
         if ($this->isCsrfTokenValid('roll_back_to_review' . $topic->getId(), $request->request->get('_token'))) {
             $this->workflow->apply($topic, 'roll_back_to_review');
-
-            $entityManager->flush();
+            $this->entityManager->flush();
         }
 
         return $this->redirectToRoute('topic_index', [], Response::HTTP_SEE_OTHER);
