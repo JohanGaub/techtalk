@@ -7,30 +7,82 @@
 
     <table class="table">
         <tbody>
+        <tr>
+            <th>Id</th>
+            <td>{{ topic.id }}</td>
+        </tr>
+        <tr>
+            <th>Label</th>
+            <td>{{ topic.label }}</td>
+        </tr>
+        <tr>
+            <th>Label</th>
+            <td>{{ topic.description }}</td>
+        </tr>
+        <tr>
+            <th>Label</th>
+            <td>{{ topic.duration ? topic.duration.format('%h:%I') : '' }}</td>
+        </tr>
+        <tr>
+            <th>Label</th>
+            <td>{{ topic.durationCategory ? topic.durationCategory.value : '' }}</td>
+        </tr>
+        <tr>
+            <th>CurrentPlace</th>
+            <td>{{ topic.currentPlace }}</td>
+        </tr>
+        <tr>
+            <th>UserPresenter</th>
+            <td>{{ topic.userPresenter ? topic.userPresenter.email : '' }}</td>
+        </tr>
+        <tr>
+            <th>Meetup label</th>
+            <td>{{ topic.meetup.label }}</td>
+        </tr>
+        <tr>
+            <th>StartDate</th>
+            <td>{{ topic.meetup.startDate ? topic.meetup.startDate|date('Y-m-d H:i:s') : '' }}</td>
+        </tr>
+        <tr>
+            <th>EndDate</th>
+            <td>{{ topic.meetup.endDate ? topic.meetup.endDate|date('Y-m-d H:i:s') : '' }}</td>
+        </tr>
+        <tr>
+            <th>Meetup agency</th>
+            <td>{{ topic.meetup.agency ? topic.meetup.agency.label : '' }}</td>
+        </tr>
+        {# ROLE_BOARD_USER part ########################################## START #}
+        {% if is_granted('ROLE_BOARD_USER') %}
             <tr>
-                <th>Id</th>
-                <td>{{ topic.id }}</td>
+                <th>UserProposer</th>
+                <td>{{ topic.userProposer ? topic.userProposer.email : '' }}</td>
             </tr>
             <tr>
-                <th>Label</th>
-                <td>{{ topic.label }}</td>
-            </tr>
-            <tr>
-                <th>CurrentPlace</th>
-                <td>{{ topic.currentPlace }}</td>
+                <th>UserReviewer</th>
+                <td>{{ topic.userReviewer ? topic.userReviewer.email : '' }}</td>
             </tr>
             <tr>
                 <th>ReviewedAt</th>
                 <td>{{ topic.reviewedAt ? topic.reviewedAt|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
             <tr>
-                <th>PresentedAt</th>
-                <td>{{ topic.presentedAt ? topic.presentedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <th>PublishedAt</th>
+                <td>{{ topic.publishedAt ? topic.publishedAt|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
+        {% endif %}
+        {# ROLE_BOARD_USER part ########################################## END #}
+        <tr>
+            <th>CreatedAt</th>
+            <td>{{ topic.createdAt ? topic.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+        </tr>
+        <tr>
+            <th>UpdatedAt</th>
+            <td>{{ topic.updatedAt ? topic.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+        </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('topic_index') }}">back to list SHOW</a>
+    <a href="{{ path('topic_index') }}">back to list</a>
 
     <a href="{{ path('topic_edit', {'id': topic.id}) }}">edit</a>
 

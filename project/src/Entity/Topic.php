@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\DurationCategory;
 use App\Repository\TopicRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -30,14 +31,17 @@ class Topic
     #[ORM\Column(nullable: true)]
     private ?\DateInterval $duration = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $durationType = null;
+    #[ORM\Column(length: 255, nullable: true, enumType: durationCategory::class)]
+    private ?durationCategory $durationCategory = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $currentPlace = null;
+    #[ORM\Column]
+    private string $currentPlace;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $reviewedAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $publishedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'proposedTopics')]
     #[ORM\JoinColumn(nullable: false)]
@@ -70,7 +74,7 @@ class Topic
         return $this->label;
     }
 
-    public function setLabel(string $label): self
+    public function setLabel(?string $label): self
     {
         $this->label = $label;
 
@@ -101,19 +105,19 @@ class Topic
         return $this;
     }
 
-    public function getDurationType(): ?string
+    public function getDurationCategory(): ?DurationCategory
     {
-        return $this->durationType;
+        return $this->durationCategory;
     }
 
-    public function setDurationType(?string $durationType): self
+    public function setDurationCategory(?DurationCategory $durationCategory): self
     {
-        $this->durationType = $durationType;
+        $this->durationCategory = $durationCategory;
 
         return $this;
     }
 
-    public function getCurrentPlace(): ?string
+    public function getCurrentPlace(): string
     {
         return $this->currentPlace;
     }
@@ -138,6 +142,18 @@ class Topic
     public function setReviewedAt(?\DateTimeImmutable $reviewedAt): self
     {
         $this->reviewedAt = $reviewedAt;
+
+        return $this;
+    }
+
+    public function getPublishedAt(): ?\DateTimeImmutable
+    {
+        return $this->reviewedAt;
+    }
+
+    public function setPublishedAt(?\DateTimeImmutable $publishedAt): self
+    {
+        $this->publishedAt = $publishedAt;
 
         return $this;
     }
