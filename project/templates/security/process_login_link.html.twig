@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Process login link{% endblock %}
+
+{% block body %}
+    <h2>Hi! You are about to login to Techtalk...</h2>
+
+    {{ form_start(form) }}
+    {{ form_row(form.expires) }}
+    {{ form_row(form.user_email) }}
+    {{ form_row(form.hash) }}
+    {{ form_row(form.submit, {'attr': {'class': 'btn btn-primary'}}) }}
+    {{ form_end(form) }}
+{% endblock %}

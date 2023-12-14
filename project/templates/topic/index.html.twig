@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Topic index{% endblock %}
+
+{% block body %}
+    <h1>Topic index</h1>
+
+    <table class="table">
+        <caption>List of topics</caption>
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Label</th>
+            <th>Description</th>
+            <th>Duration</th>
+            <th>DurationCategory</th>
+            <th>CurrentPlace</th>
+            <th>UserPresenter</th>
+            <th>Meetup label</th>
+            <th>Meetup start date</th>
+            <th>Meetup end date</th>
+            <th>Meetup agency</th>
+            {# ROLE_BOARD_USER part ########################################## START #}
+            {% if is_granted('ROLE_BOARD_USER') %}
+                <th>UserProposer</th>
+                <th>UserReviewer</th>
+                <th>ReviewedAt</th>
+                <th>PublishedAt</th>
+            {% endif %}
+            {# ROLE_BOARD_USER part ########################################## END #}
+            <th>CreatedAt</th>
+            <th>UpdatedAt</th>
+            <th>actions</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for topic in topics %}
+            <tr>
+                <td>{{ topic.id }}</td>
+                <td>{{ topic.label }}</td>
+                <td>{{ topic.description }}</td>
+                <td>{{ topic.duration ? topic.duration.format('%h:%I') : '' }}</td>
+                <td>{{ topic.durationCategory ? topic.durationCategory.value : '' }}</td>
+                <td>{{ topic.currentPlace }}</td>
+                <td>{{ topic.userPresenter.email }}</td>
+                <td>{{ topic.meetup.label ? topic.meetup.label : '' }}</td>
+                <td>{{ topic.meetup.startDate ? topic.meetup.startDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ topic.meetup.endDate ? topic.meetup.endDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ topic.meetup.agency.label ? topic.meetup.agency.label : '' }}</td>
+                {# ROLE_BOARD_USER part ########################################## START #}
+                {% if is_granted('ROLE_BOARD_USER') %}
+                    <td>{{ topic.userProposer ? topic.userProposer.email : '' }}</td>
+                    <td>{{ topic.userReviewer ? topic.userReviewer.email : '' }}</td>
+                    <td>{{ topic.reviewedAt ? topic.reviewedAt|date('Y-m-d H:i:s') : '' }}</td>
+                    <td>{{ topic.publishedAt ? topic.publishedAt|date('Y-m-d H:i:s') : '' }}</td>
+                {% endif %}
+                {# ROLE_BOARD_USER part ########################################## END #}
+                <td>{{ topic.createdAt ? topic.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ topic.updatedAt ? topic.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('topic_show', {'id': topic.id}) }}">show</a>
+                    <a href="{{ path('topic_edit', {'id': topic.id}) }}">edit</a>
+                    {{ include('topic/_delete_form.html.twig') }}
+
+                    {% for transition in workflow_transitions(topic) %}
+                        <form method="post" action="{{ path('topic_' ~ transition.name, {'id': topic.id, 'transition': transition}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token(transition.name ~ topic.id) }}">
+                            <button type="submit">{{ transition.name }}</button>
+                        </form>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('topic_create') }}">Create new</a>
+{% endblock %}

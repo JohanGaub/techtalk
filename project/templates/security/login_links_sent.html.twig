@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login Links Sent{% endblock %}
+
+{% block body %}
+    <h1>Login Links Sent</h1>
+
+    {% if success %}
+        <h2>Successful sending of Login Link</h2>
+        <p>{{ total_success }} login links have been sent to the email addresses of those users:</p>
+        <ul>
+            {% for user in success %}
+                <li>{{ user.email }}</li>
+            {% endfor %}
+        </ul>
+        <p>They can now check their inbox and click on the link to log in.</p>
+    {% endif %}
+
+    {% if failure %}
+        <h2>Failed Login Link sending</h2>
+        <p>{{ total_failure }} login links could not be sent to the email addresses of those users:</p>
+        <ul>
+            {% for user in failure %}
+                <li>{{ user.email }} - {{ user.error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

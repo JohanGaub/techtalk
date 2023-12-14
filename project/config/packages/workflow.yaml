@@ -1,0 +1,33 @@
+framework:
+    workflows:
+        topic_publishing:
+            type: 'state_machine' # or 'workflow'
+            audit_trail:
+                enabled: true # makes the application generate detailed log messages (@see https://symfony.com/doc/current/components/workflow.html#creating-a-workflow)
+            marking_store:
+                type: 'method'
+                property: 'currentPlace'
+            supports:
+                - App\Entity\Topic
+            initial_marking: '%current_place_draft%'
+            places:
+                - '%current_place_draft%'
+                - '%current_place_reviewed%'
+                - '%current_place_published%'
+            transitions:
+                ask_for_review:
+                    guard: "is_granted('ROLE_USER')"
+                    from: '%current_place_draft%'
+                    to: '%current_place_reviewed%'
+                reject_to_draft:
+                    guard: "is_granted('ROLE_BOARD_USER')"
+                    from: '%current_place_reviewed%'
+                    to: '%current_place_draft%'
+                publish:
+                    guard: "is_granted('ROLE_BOARD_USER')"
+                    from: '%current_place_reviewed%'
+                    to: '%current_place_published%'
+                roll_back_to_review:
+                    guard: "is_granted('ROLE_BOARD_USER')"
+                    from: '%current_place_published%'
+                    to: '%current_place_reviewed%'
