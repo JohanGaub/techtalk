@@ -51,26 +51,11 @@ class TopicRepository extends ServiceEntityRepository
     public function getTopicsForUser(): array
     {
         return $this->createQueryBuilder('t')
-            ->select(
-                't.id',
-                't.label',
-                't.description',
-                't.duration',
-                't.durationCategory',
-                't.currentPlace',
-                't.createdAt',
-                't.updatedAt',
-                'u.email as userPresenter', // Select the id of the userPresenter
-                'userProposer.id as userProposerId', // Select the id of the userPresenter
-                'm.label as meetupLabel',
-                'm.startDate as meetupStartDate',
-                'm.endDate as meetupEndDate',
-                'a.label as meetupAgency'
-            )
-            ->leftJoin('t.meetup', 'm')
-            ->leftJoin('t.userPresenter', 'u') // Retrieve the UserPresenter
-            ->leftJoin('t.userProposer', 'userProposer') // Retrieve the UserProposer
-            ->leftJoin('m.agency', 'a') // Retrieve the Agency from the Meetup
+            ->select('t') // Select the entire Topic object
+            ->leftJoin('t.meetup', 'meetup')
+            ->leftJoin('t.userPresenter', 'userPresenter')
+            ->leftJoin('t.userProposer', 'userProposer')
+            ->leftJoin('meetup.agency', 'agency')
             // Only retrieve Topics with currentPlace = 'draft'
             ->andWhere('t.currentPlace = :currentPlace')
             // A user can only see their OWN topics
