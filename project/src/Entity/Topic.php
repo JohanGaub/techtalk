@@ -127,7 +127,7 @@ class Topic
      * You don't need to set the initial marking in the constructor or any other method;
      * this is configured in the workflow with the 'initial_marking' option.
      */
-    public function setCurrentPlace(string $currentPlace, array $context = []): self
+    public function setCurrentPlace(string $currentPlace): self
     {
         $this->currentPlace = $currentPlace;
 
@@ -148,7 +148,7 @@ class Topic
 
     public function getPublishedAt(): ?\DateTimeImmutable
     {
-        return $this->reviewedAt;
+        return $this->publishedAt;
     }
 
     public function setPublishedAt(?\DateTimeImmutable $publishedAt): self

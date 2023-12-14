@@ -32,36 +32,24 @@ class TopicRepository extends ServiceEntityRepository
      * leftJoin improves performance by avoiding unnecessary joins.
      * If a Topic does not have an associated Meetup, the Meetup fields will be null.
      */
-    public function getTopicsForBoardUser(): array
+    public function getTopicsForBoardUser()
     {
         return $this->createQueryBuilder('t')
             ->select(
-                't.id',
-                't.label',
-                't.description',
-                't.duration',
-                't.durationCategory',
-                't.currentPlace',
-                't.createdAt',
-                't.updatedAt',
-                'u.email as userPresenter', // Select the id of the userPresenter
-                'm.label as meetupLabel',
-                'm.startDate as meetupStartDate',
-                'm.endDate as meetupEndDate',
-                'a.label as meetupAgency'
+                't',
+                'userPresenter',
+                'meetup',
+                'agency'
             )
-            ->leftJoin('t.meetup', 'm')
-            ->leftJoin('t.userPresenter', 'u') // Retrieve the UserPresenter
-            ->leftJoin('m.agency', 'a') // Retrieve the Agency from the Meetup
+            ->leftJoin('t.meetup', 'meetup')
+            ->leftJoin('t.userPresenter', 'userPresenter')
+            ->leftJoin('meetup.agency', 'agency')
             ->getQuery()
             ->getResult();
     }
 
     public function getTopicsForUser(): array
     {
-        $user = $this->security->getUser();
-        dump($user);
-
         return $this->createQueryBuilder('t')
             ->select(
                 't.id',

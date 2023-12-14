@@ -13,7 +13,6 @@ framework:
             places:
                 - '%current_place_draft%'
                 - '%current_place_reviewed%'
-                #                - '%current_place_rejected%'
                 - '%current_place_published%'
             transitions:
                 ask_for_review:
@@ -23,7 +22,6 @@ framework:
                 reject_to_draft:
                     guard: "is_granted('ROLE_BOARD_USER')"
                     from: '%current_place_reviewed%'
-                    #                    to: '%current_place_rejected%'
                     to: '%current_place_draft%'
                 publish:
                     guard: "is_granted('ROLE_BOARD_USER')"

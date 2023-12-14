@@ -37,6 +37,6 @@ services:
         arguments:
             - '@router'
 
-    App\EventListener\TopicReviewSubscriber:
-        tags:
-            - { name: 'kernel.event_subscriber' }
+#    App\EventSubscriber\TopicPublishingSubscriber:
+#        tags:
+#            - { name: 'kernel.event_subscriber' }

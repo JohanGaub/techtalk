@@ -34,6 +34,7 @@
         </tr>
         </thead>
         <tbody>
+
         {% for topic in topics %}
             <tr>
                 <td>{{ topic.id }}</td>
@@ -42,17 +43,17 @@
                 <td>{{ topic.duration ? topic.duration.format('%h:%I') : '' }}</td>
                 <td>{{ topic.durationCategory ? topic.durationCategory.value : '' }}</td>
                 <td>{{ topic.currentPlace }}</td>
-                <td>{{ topic.userPresenter }}</td>
-                <td>{{ topic.meetupLabel ? topic.meetupLabel : '' }}</td>
-                <td>{{ topic.meetupStartDate ? topic.meetupStartDate|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ topic.meetupEndDate ? topic.meetupEndDate|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ topic.meetupAgency ? topic.meetupAgency : '' }}</td>
+                <td>{{ topic.userPresenter.email }}</td>
+                <td>{{ topic.meetup.label ? topic.meetup.label : '' }}</td>
+                <td>{{ topic.meetup.startDate ? topic.meetup.startDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ topic.meetup.endDate ? topic.meetup.endDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ topic.meetup.agency.label ? topic.meetup.agency.label : '' }}</td>
                 {# ROLE_BOARD_USER part ########################################## START #}
                 {% if is_granted('ROLE_BOARD_USER') %}
-                    <td>{{ topic.userProposer is defined ? topic.userProposer : '' }}</td>
-                    <td>{{ topic.userReviewer is defined ? topic.userReviewer : '' }}</td>
-                    <td>{{ topic.reviewedAt is defined ? topic.reviewedAt|date('Y-m-d H:i:s') : '' }}</td>
-                    <td>{{ topic.publishedAt is defined ? topic.publishedAt|date('Y-m-d H:i:s') : '' }}</td>
+                    <td>{{ topic.userProposer ? topic.userProposer.email : '' }}</td>
+                    <td>{{ topic.userReviewer ? topic.userReviewer.email : '' }}</td>
+                    <td>{{ topic.reviewedAt ? topic.reviewedAt|date('Y-m-d H:i:s') : '' }}</td>
+                    <td>{{ topic.publishedAt ? topic.publishedAt|date('Y-m-d H:i:s') : '' }}</td>
                 {% endif %}
                 {# ROLE_BOARD_USER part ########################################## END #}
                 <td>{{ topic.createdAt ? topic.createdAt|date('Y-m-d H:i:s') : '' }}</td>
@@ -62,30 +63,12 @@
                     <a href="{{ path('topic_edit', {'id': topic.id}) }}">edit</a>
                     {{ include('topic/_delete_form.html.twig') }}
 
-                    {% if topic.currentPlace == 'draft' %}
-                        <form method="post" action="{{ path('topic_ask_for_review', {'id': topic.id}) }}">
-                            <input type="hidden" name="_token" value="{{ csrf_token('ask_for_review' ~ topic.id) }}">
-                        <button type="submit">Ask for review</button>
+                    {% for transition in workflow_transitions(topic) %}
+                        <form method="post" action="{{ path('topic_' ~ transition.name, {'id': topic.id, 'transition': transition}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token(transition.name ~ topic.id) }}">
+                            <button type="submit">{{ transition.name }}</button>
                         </form>
-                    {% elseif is_granted('ROLE_BOARD_USER') %}
-                        {% if topic.currentPlace == 'published' %}
-                            <form method="post" action="{{ path('topic_roll_back_to_review', {'id': topic.id}) }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('roll_back_to_review' ~ topic.id) }}">
-                                <button type="submit">Roll back to review</button>
-                            </form>
-                        {% else %}
-                            <form method="post" action="{{ path('topic_reject_to_draft', {'id': topic.id}) }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('reject_to_draft' ~ topic.id) }}">
-                                <button type="submit">Reject to draft</button>
-                            </form>
-                        {% endif %}
-                        {% if topic.currentPlace != 'published' %}
-                            <form method="post" action="{{ path('topic_publish', {'id': topic.id}) }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('publish' ~ topic.id) }}">
-                                <button type="submit">Publish</button>
-                            </form>
-                        {% endif %}
-                    {% endif %}
+                    {% endfor %}
                 </td>
             </tr>
         {% else %}
