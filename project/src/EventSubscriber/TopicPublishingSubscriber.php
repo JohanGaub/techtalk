@@ -20,7 +20,7 @@ class TopicPublishingSubscriber implements EventSubscriberInterface
         /** @var Topic $topic */
         $topic = $event->getSubject();
 
-        $topic->setReviewedAt(new \DateTimeImmutable());
+        $topic->setInReviewAt(new \DateTimeImmutable());
     }
 
     public function onRejectToDraft(TransitionEvent $event): void
@@ -28,7 +28,7 @@ class TopicPublishingSubscriber implements EventSubscriberInterface
         /** @var Topic $topic */
         $topic = $event->getSubject();
 
-        $topic->setReviewedAt(null);
+        $topic->setInReviewAt(null);
     }
 
     public function onPublish(TransitionEvent $event): void
@@ -36,7 +36,7 @@ class TopicPublishingSubscriber implements EventSubscriberInterface
         /** @var Topic $topic */
         $topic = $event->getSubject();
 
-        $topic->setUserReviewer($this->security->getUser());
+        $topic->setUserPublisher($this->security->getUser());
         $topic->setPublishedAt(new \DateTimeImmutable());
     }
 
@@ -45,7 +45,7 @@ class TopicPublishingSubscriber implements EventSubscriberInterface
         /** @var Topic $topic */
         $topic = $event->getSubject();
 
-        $topic->setUserReviewer(null);
+        $topic->setUserPublisher(null);
         $topic->setPublishedAt(null);
     }
 

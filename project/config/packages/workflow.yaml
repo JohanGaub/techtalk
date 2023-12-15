@@ -12,22 +12,22 @@ framework:
             initial_marking: '%current_place_draft%'
             places:
                 - '%current_place_draft%'
-                - '%current_place_reviewed%'
+                - '%current_place_in_review%'
                 - '%current_place_published%'
             transitions:
                 ask_for_review:
                     guard: "is_granted('ROLE_USER')"
                     from: '%current_place_draft%'
-                    to: '%current_place_reviewed%'
+                    to: '%current_place_in_review%'
                 reject_to_draft:
                     guard: "is_granted('ROLE_BOARD_USER')"
-                    from: '%current_place_reviewed%'
+                    from: '%current_place_in_review%'
                     to: '%current_place_draft%'
                 publish:
                     guard: "is_granted('ROLE_BOARD_USER')"
-                    from: '%current_place_reviewed%'
+                    from: '%current_place_in_review%'
                     to: '%current_place_published%'
                 roll_back_to_review:
                     guard: "is_granted('ROLE_BOARD_USER')"
                     from: '%current_place_published%'
-                    to: '%current_place_reviewed%'
+                    to: '%current_place_in_review%'

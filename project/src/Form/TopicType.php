@@ -66,7 +66,7 @@ class TopicType extends AbstractType
                 'placeholder' => 'Select a current place',
                 'choices' => [
                     CurrentPlace::DRAFT->value => CurrentPlace::DRAFT->value,
-                    CurrentPlace::REVIEWED->value => CurrentPlace::REVIEWED->value,
+                    CurrentPlace::IN_REVIEW->value => CurrentPlace::IN_REVIEW->value,
                     CurrentPlace::PUBLISHED->value => CurrentPlace::PUBLISHED->value,
                 ],
             ]);
