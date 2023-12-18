@@ -65,7 +65,7 @@
 
                     {% for transition in workflow_transitions(topic) %}
                         {% if transition.name != 'publish' or (transition.name == 'publish' and app.user != topic.userProposer) %}
-                            <form method="post" action="{{ path('topic_' ~ transition.name, {'id': topic.id, 'transition': transition}) }}">
+                            <form method="post" action="{{ path('topic_do_transition', {'id': topic.id, 'transitionName': transition.name}) }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token(transition.name ~ topic.id) }}">
                                 <button type="submit">{{ transition.name }}</button>
                             </form>

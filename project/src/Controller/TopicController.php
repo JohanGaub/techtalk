@@ -96,59 +96,17 @@ class TopicController extends AbstractController
     }
 
     /**
-     * We're using Workflow Component. We're in transition "reject_to_draft".
-     * We're passing from "in_review" to "draft" current place.
+     * We're using Workflow Component.
+     * When we're in transition "ask_for_review". We're passing from "draft" to "in_review" current place.
+     * When we're in transition "reject_to_draft". We're passing from "in_review" to "draft" current place.
+     * When we're in transition "publish". We're passing from "in_review" to "published" current place.
+     * When we're in transition "roll_back_to_review". We're rolling back from "published" to "in_review" current place.
      */
-    #[Route('/{id}/reject-to-draft', name: 'reject_to_draft', methods: [Request::METHOD_POST])]
-    public function rejectedToDraft(Request $request, Topic $topic): Response
+    #[Route('/{id}/{transitionName}', name: 'do_transition', methods: [Request::METHOD_POST])]
+    public function doTransition(Request $request, Topic $topic, string $transitionName): Response
     {
-        if ($this->isCsrfTokenValid('reject_to_draft' . $topic->getId(), $request->request->get('_token'))) {
-            $this->workflow->apply($topic, 'reject_to_draft');
-            $this->entityManager->flush();
-        }
-
-        return $this->redirectToRoute('topic_index', [], Response::HTTP_SEE_OTHER);
-    }
-
-    /**
-     * We're in transition "ask_for_review".
-     * We're passing from "draft" to "in_review" current place.
-     */
-    #[Route('/{id}/ask-for-review', name: 'ask_for_review', methods: [Request::METHOD_POST])]
-    public function askForReview(Request $request, Topic $topic): Response
-    {
-        if ($this->isCsrfTokenValid('ask_for_review' . $topic->getId(), $request->request->get('_token'))) {
-            $this->workflow->apply($topic, 'ask_for_review');
-            $this->entityManager->flush();
-        }
-
-        return $this->redirectToRoute('topic_index', [], Response::HTTP_SEE_OTHER);
-    }
-
-    /**
-     * We're in transition "publish".
-     * We're passing from "in_review" to "published" current place.
-     */
-    #[Route('/{id}/publish', name: 'publish', methods: [Request::METHOD_POST])]
-    public function publish(Request $request, Topic $topic): Response
-    {
-        if ($this->isCsrfTokenValid('publish' . $topic->getId(), $request->request->get('_token'))) {
-            $this->workflow->apply($topic, 'publish');
-            $this->entityManager->flush();
-        }
-
-        return $this->redirectToRoute('topic_index', [], Response::HTTP_SEE_OTHER);
-    }
-
-    /**
-     * We're in transition "roll_back_to_review".
-     * We're rolling back from "published" to "in_review" current place.
-     */
-    #[Route('/{id}/roll-back-to-review', name: 'roll_back_to_review', methods: [Request::METHOD_POST])]
-    public function rollBackToReview(Request $request, Topic $topic): Response
-    {
-        if ($this->isCsrfTokenValid('roll_back_to_review' . $topic->getId(), $request->request->get('_token'))) {
-            $this->workflow->apply($topic, 'roll_back_to_review');
+        if ($this->isCsrfTokenValid(sprintf('%s%d', $transitionName, $topic->getId()), $request->request->get('_token'))) {
+            $this->workflow->apply($topic, $transitionName);
             $this->entityManager->flush();
         }
 
