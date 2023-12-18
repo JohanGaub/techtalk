@@ -58,12 +58,12 @@
                 <td>{{ topic.userProposer ? topic.userProposer.email : '' }}</td>
             </tr>
             <tr>
-                <th>UserReviewer</th>
-                <td>{{ topic.userReviewer ? topic.userReviewer.email : '' }}</td>
+                <th>UserPublisher</th>
+                <td>{{ topic.userPublisher ? topic.userPublisher.email : '' }}</td>
             </tr>
             <tr>
                 <th>ReviewedAt</th>
-                <td>{{ topic.reviewedAt ? topic.reviewedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ topic.inReviewAt ? topic.inReviewAt |date('Y-m-d H:i:s') : '' }}</td>
             </tr>
             <tr>
                 <th>PublishedAt</th>

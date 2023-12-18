@@ -69,9 +69,9 @@ class TopicControllerTest extends WebTestCase
         $fixture = new Topic();
         $fixture->setLabel('My Title');
         $fixture->setCurrentPlace('My Title');
-        $fixture->setReviewedAt('My Title');
+        $fixture->setInReviewAt('My Title');
         $fixture->setUserProposer('My Title');
-        $fixture->setUserReviewer('My Title');
+        $fixture->setUserPublisher('My Title');
         $fixture->setUserPresenter('My Title');
 
         $this->manager->persist($fixture);
@@ -91,9 +91,9 @@ class TopicControllerTest extends WebTestCase
         $fixture = new Topic();
         $fixture->setLabel('Value');
         $fixture->setCurrentPlace('Value');
-        $fixture->setReviewedAt('Value');
+        $fixture->setInReviewAt('Value');
         $fixture->setUserProposer('Value');
-        $fixture->setUserReviewer('Value');
+        $fixture->setUserPublisher('Value');
         $fixture->setUserPresenter('Value');
 
         $this->manager->persist($fixture);
@@ -104,9 +104,9 @@ class TopicControllerTest extends WebTestCase
         $this->client->submitForm('Update', [
             'topic[label]' => 'Something New',
             'topic[currentPlace]' => 'Something New',
-            'topic[reviewedAt]' => 'Something New',
+            'topic[inReviewAt]' => 'Something New',
             'topic[userProposer]' => 'Something New',
-            'topic[userReviewer]' => 'Something New',
+            'topic[userPublisher]' => 'Something New',
             'topic[userPresenter]' => 'Something New',
         ]);
 
@@ -116,9 +116,9 @@ class TopicControllerTest extends WebTestCase
 
         self::assertSame('Something New', $fixture[0]->getLabel());
         self::assertSame('Something New', $fixture[0]->getCurrentPlace());
-        self::assertSame('Something New', $fixture[0]->getValidatedAt());
+        self::assertSame('Something New', $fixture[0]->getInReviewAt());
         self::assertSame('Something New', $fixture[0]->getUserProposer());
-        self::assertSame('Something New', $fixture[0]->getUserValidator());
+        self::assertSame('Something New', $fixture[0]->getUserPublisher());
         self::assertSame('Something New', $fixture[0]->getUserPresenter());
     }
 
@@ -128,9 +128,9 @@ class TopicControllerTest extends WebTestCase
         $fixture = new Topic();
         $fixture->setLabel('Value');
         $fixture->setCurrentPlace('Value');
-        $fixture->setReviewedAt('Value');
+        $fixture->setInReviewAt('Value');
         $fixture->setUserProposer('Value');
-        $fixture->setUserReviewer('Value');
+        $fixture->setUserPublisher('Value');
         $fixture->setUserPresenter('Value');
 
         $this->manager->remove($fixture);

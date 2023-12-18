@@ -16,20 +16,20 @@ class CurrentPlaceType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('review', ButtonType::class, [
+            ->add('draft', ButtonType::class, [
+                'attr' => ['class' => 'btn btn-primary'],
+            ])
+            ->add('in_review', ButtonType::class, [
                 'attr' => ['class' => 'btn btn-primary'],
             ])
             ->add('publish', ButtonType::class, [
-                'attr' => ['class' => 'btn btn-primary'],
-            ])
-            ->add('reject', ButtonType::class, [
                 'attr' => ['class' => 'btn btn-primary'],
             ]);
         //            ->add('currentPlace', ButtonType::class, [
         //                'placeholder' => 'Select a current place',
         //                'choices' => [
         //                    CurrentPlace::DRAFT->value => CurrentPlace::DRAFT->value,
-        //                    CurrentPlace::REVIEWED->value => CurrentPlace::REVIEWED->value,
+        //                    CurrentPlace::IN_REVIEW->value => CurrentPlace::IN_REVIEW->value,
         //                    CurrentPlace::PUBLISHED->value => CurrentPlace::PUBLISHED->value,
         //                ],
         //            ])

@@ -24,6 +24,5 @@ class AdminController extends AbstractController
         return $this->render('home/home.html.twig', [
             'controller_name' => self::class,
         ]);
-
     }
 }

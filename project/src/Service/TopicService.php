@@ -37,8 +37,8 @@ class TopicService
     public function review(Topic $topic): void
     {
         $this->doTransition('to_review', $topic);
-        $topic->setCurrentPlace(CurrentPlace::REVIEWED->value);
-        $topic->setReviewedAt(new \DateTimeImmutable());
+        $topic->setCurrentPlace(CurrentPlace::IN_REVIEW->value);
+        $topic->setInReviewAt(new \DateTimeImmutable());
 
         $this->entityManager->persist($topic);
         //        $this->entityManager->flush();
@@ -49,7 +49,7 @@ class TopicService
         $this->doTransition('publish', $topic);
         $topic->setCurrentPlace(CurrentPlace::PUBLISHED->value);
         $topic->setPublishedAt(new \DateTimeImmutable());
-        $topic->setUserReviewer($this->security->getUser());
+        $topic->setUserPublisher($this->security->getUser());
 
         $this->entityManager->persist($topic);
         //        $this->entityManager->flush();
@@ -59,7 +59,7 @@ class TopicService
     {
         $this->doTransition('reject_to_draft', $topic);
         $topic->setCurrentPlace(CurrentPlace::DRAFT->value);
-        $topic->setUserReviewer(null);
+        $topic->setUserPublisher(null);
 
         $this->entityManager->persist($topic);
         //        $this->entityManager->flush();

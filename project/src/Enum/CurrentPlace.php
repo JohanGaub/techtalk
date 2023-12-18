@@ -9,7 +9,6 @@ enum CurrentPlace: string
     use EnumTrait;
 
     case DRAFT = 'draft';
-    case REVIEWED = 'reviewed';
-    //    case REJECTED = 'rejected';
+    case IN_REVIEW = 'in_review';
     case PUBLISHED = 'published';
 }

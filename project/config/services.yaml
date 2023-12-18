@@ -6,7 +6,7 @@
 parameters:
     user_directory: '%kernel.project_dir%/asset/upload/user'
     current_place_draft: !php/enum App\Enum\CurrentPlace::DRAFT->value
-    current_place_reviewed: !php/enum App\Enum\CurrentPlace::REVIEWED->value
+    current_place_in_review: !php/enum App\Enum\CurrentPlace::IN_REVIEW->value
     current_place_published: !php/enum App\Enum\CurrentPlace::PUBLISHED->value
 services:
     # default configuration for services in *this* file
@@ -36,7 +36,3 @@ services:
     App\EventListener\LoginRedirectListener:
         arguments:
             - '@router'
-
-#    App\EventSubscriber\TopicPublishingSubscriber:
-#        tags:
-#            - { name: 'kernel.event_subscriber' }
