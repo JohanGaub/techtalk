@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-#[Route('/admin', name: 'admin_')]
+#[Route('/admin_old', name: 'admin_old_')]
 class AdminController extends AbstractController
 {
     #[Route('/home', name: 'home', methods: [Request::METHOD_GET], priority: 1)]

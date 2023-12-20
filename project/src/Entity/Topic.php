@@ -103,6 +103,11 @@ class Topic
         return $this->duration;
     }
 
+    public function getDurationForEasyAdmin(): ?string
+    {
+        return $this->duration?->format('%h hours %i minutes');
+    }
+
     public function setDuration(?\DateInterval $duration): self
     {
         $this->duration = $duration;

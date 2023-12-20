@@ -36,3 +36,8 @@ services:
     App\EventListener\LoginRedirectListener:
         arguments:
             - '@router'
+
+    App\DataTransformer\ArrayToDateIntervalTransformer:
+        autowire: true
+        autoconfigure: true
+        public: false
