@@ -103,14 +103,44 @@ class Topic
         return $this->duration;
     }
 
-    public function getDurationForEasyAdmin(): ?string
+    public function getDurationAsString(): ?string
     {
         return $this->duration?->format('%h hours %i minutes');
+    }
+
+    public function getDurationAsArray(): ?array
+    {
+        if (!$this->duration instanceof \DateInterval) {
+            return null;
+        }
+
+        return [
+            'hours' => $this->duration->h,
+            'minutes' => $this->duration->i,
+        ];
     }
 
     public function setDuration(?\DateInterval $duration): self
     {
         $this->duration = $duration;
+
+        return $this;
+    }
+
+    public function setDurationAsString(\DateInterval|string|array|null $duration): self
+    {
+        if ($duration instanceof \DateInterval) {
+            $this->duration = $duration;
+        } elseif (is_string($duration)) {
+            $parts = explode(' ', $duration);
+            $hours = (int)$parts[0];
+            $minutes = (int)$parts[2];
+            $this->duration = new \DateInterval(sprintf('PT%dH%dM', $hours, $minutes));
+        } elseif (is_array($duration) && isset($duration['hours'], $duration['minutes'])) {
+            $this->duration = new \DateInterval(sprintf('PT%dH%dM', $duration['hours'], $duration['minutes']));
+        } else {
+            throw new \InvalidArgumentException('Invalid duration value');
+        }
 
         return $this;
     }
@@ -266,5 +296,10 @@ class Topic
         $this->users->removeElement($user);
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return sprintf("%s - %s", $this->getLabel(), $this->getDescription()) ?? '';
     }
 }
