@@ -13,4 +13,10 @@ trait DetailTrait
         return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setDefaultSort(['updatedAt' => 'DESC']);
+    }
 }
