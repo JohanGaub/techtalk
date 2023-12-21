@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
+use App\Controller\Admin\Trait\DetailTrait;
 use App\Entity\Topic;
 use App\Enum\DurationCategory;
 use App\Form\DurationType;
@@ -11,12 +12,15 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class TopicCrudController extends AbstractCrudController
 {
+    use DetailTrait;
+
     public static function getEntityFqcn(): string
     {
         return Topic::class;
@@ -30,22 +34,15 @@ class TopicCrudController extends AbstractCrudController
             TextareaField::new('description'),
 
             /**
-             * For duration field, we use a custom form type (@see DurationType) with an array with 'hours' and 'minutes' integers in inputs.
-             * And we use a custom data transformer (@see ArrayToDateIntervalTransformer) to transform the hours and minutes integers into a DateInterval object.
+             * For duration field, we use a custom form type (@see DurationType) with DateInterval object in inputs.
+             * And we use a custom data transformer (@see ArrayToDateIntervalTransformer) to transform the hours and minutes into suitable format.
              */
-            TextField::new('duration')
-                ->hideOnIndex()
+            TextField::new('durationAsString', 'Duration')
                 ->setFormType(DurationType::class)
                 ->setFormTypeOptions([
                     'label' => false,
                 ])
             ,
-            /**
-             * To display the duration field in the index/list view, we use a custom getter from the Meetup entity : 'getDurationForEasyAdmin'.
-             */
-            TextField::new('durationForEasyAdmin')->hideOnForm(),
-
-
             ChoiceField::new('durationCategory')->setChoices(DurationCategory::cases()),
             ChoiceField::new('currentPlace')->setChoices([
                 'Draft' => 'draft',
@@ -73,7 +70,6 @@ class TopicCrudController extends AbstractCrudController
                     return $value ? $value->getEmail() : '';
                 })->hideOnForm(),
             DateTimeField::new('inReviewAt')->hideOnForm(),
-
             DateTimeField::new('publishedAt')->hideOnForm(),
         ];
     }

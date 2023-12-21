@@ -47,5 +47,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Meetup', 'fa-brands fa-meetup', Meetup::class);
         yield MenuItem::linkToCrud('Topic', 'fa-solid fa-message', Topic::class);
         yield MenuItem::linkToCrud('Agency', 'fa-solid fa-location-dot', Agency::class);
+        //        yield MenuItem::linkToCrud('Vote', 'fa-solid fa-star-half-stroke', ::class);
+        //        yield MenuItem::linkToCrud('Participant', 'fa-solid fa-people-line', ::class);
     }
 }
