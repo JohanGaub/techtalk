@@ -7,7 +7,7 @@ namespace App\Controller\Admin;
 use App\Controller\Admin\Trait\DetailTrait;
 use App\Entity\Topic;
 use App\Enum\DurationCategory;
-use App\Form\DurationType;
+use App\Field\DateIntervalField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -15,6 +15,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
 
 class TopicCrudController extends AbstractCrudController
 {
@@ -28,20 +29,27 @@ class TopicCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')->hideOnForm()->setSortable(true),
+            IdField::new('id')->hideOnForm(),
             TextField::new('label'),
             TextareaField::new('description'),
-
-            /**
-             * For duration field, we use a custom form type (@see DurationType) with DateInterval object in inputs.
-             * And we use a custom data transformer (@see ArrayToDateIntervalTransformer) to transform the hours and minutes into suitable format.
-             */
-            TextField::new('durationAsString', 'Duration')
-                ->setFormType(DurationType::class)
+            DateIntervalField::new('duration', 'Duration')
+                ->setFormType(DateIntervalType::class)
                 ->setFormTypeOptions([
                     'label' => false,
+                    'widget' => 'choice',
+                    'with_years' => false,
+                    'with_months' => false,
+                    'with_days' => false,
+                    'with_minutes' => true,
+                    'with_hours' => true,
+                    'minutes' => array_combine(range(0, 45, 15), range(0, 45, 15)),
+                    'hours' => range(0, 4),
+                    'placeholder' => [
+                        'hours' => 'Hours',
+                        'minutes' => 'Minutes'
+                    ],
                 ])
-            ,
+              ,
             ChoiceField::new('durationCategory')->setChoices(DurationCategory::cases()),
             ChoiceField::new('currentPlace')->setChoices([
                 'Draft' => 'draft',
