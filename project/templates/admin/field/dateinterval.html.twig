@@ -1,0 +1,5 @@
+{% if field.value is not null %}
+    {{ field.value.format('%h hours %i minutes') }}
+{% else %}
+    No duration set
+{% endif %}
