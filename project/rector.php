@@ -19,7 +19,7 @@ return static function (RectorConfig $rectorConfig): void {
         SetList::CODING_STYLE,
         SetList::DEAD_CODE,
         SetList::PHP_82,
-        SymfonyLevelSetList::UP_TO_SYMFONY_63,
+        SymfonyLevelSetList::UP_TO_SYMFONY_64,
         SymfonySetList::SYMFONY_CODE_QUALITY
     ]);
 };

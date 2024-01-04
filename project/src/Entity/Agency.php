@@ -21,7 +21,7 @@ class Agency
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?string $label = null;
+    private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'agency', targetEntity: User::class)]
     private Collection $users;
@@ -40,14 +40,14 @@ class Agency
         return $this->id;
     }
 
-    public function getLabel(): ?string
+    public function getName(): ?string
     {
-        return $this->label;
+        return $this->name;
     }
 
-    public function setLabel(string $label): self
+    public function setName(string $name): self
     {
-        $this->label = $label;
+        $this->name = $name;
 
         return $this;
     }
@@ -110,6 +110,6 @@ class Agency
 
     public function __toString(): string
     {
-        return $this->getLabel() ?? '';
+        return $this->getName() ?? '';
     }
 }

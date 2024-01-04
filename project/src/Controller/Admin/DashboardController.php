@@ -15,11 +15,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class DashboardController extends AbstractDashboardController
 {
+    public $container;
+
     #[Route('/admin', name: 'admin')]
     public function index(): Response
     {
-        //        return parent::index();
-
         // Option 1. You can make your dashboard redirect to some common page of your backend
         $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
         return $this->redirect($adminUrlGenerator->setController(UserCrudController::class)->generateUrl());

@@ -19,8 +19,8 @@ class Meetup
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $label = null;
+    #[ORM\Column]
+    private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
@@ -47,14 +47,10 @@ class Meetup
     #[ORM\JoinTable(name: 'meetups_users_participant')]
     private Collection $users;
 
-    //    #[ORM\OneToMany(mappedBy: 'meetup', targetEntity: MeetupUserParticipant::class)]
-    //    private Collection $userMeetups;
-
     public function __construct()
     {
         $this->topics = new ArrayCollection();
         $this->users = new ArrayCollection();
-        //        $this->userMeetups = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -62,14 +58,14 @@ class Meetup
         return $this->id;
     }
 
-    public function getLabel(): ?string
+    public function getName(): ?string
     {
-        return $this->label;
+        return $this->name;
     }
 
-    public function setLabel(string $label): self
+    public function setName(string $name): self
     {
-        $this->label = $label;
+        $this->name = $name;
 
         return $this;
     }
@@ -174,33 +170,6 @@ class Meetup
         return $this;
     }
 
-    //    /**
-    //     * @return Collection<int, MeetupUserParticipant>
-    //     */
-    //    public function getUserMeetups(): Collection
-    //    {
-    //        return $this->userMeetups;
-    //    }
-    //
-    //    public function addUserMeetup(MeetupUserParticipant $userMeetup): static
-    //    {
-    //        if (!$this->userMeetups->contains($userMeetup)) {
-    //            $this->userMeetups->add($userMeetup);
-    //            $userMeetup->setMeetup($this);
-    //        }
-    //
-    //        return $this;
-    //    }
-    //
-    //    public function removeUserMeetup(MeetupUserParticipant $userMeetup): static
-    //    {
-    //        // set the owning side to null (unless already changed)
-    //        if ($this->userMeetups->removeElement($userMeetup) && $userMeetup->getMeetup() === $this) {
-    //            $userMeetup->setMeetup(null);
-    //        }
-    //
-    //        return $this;
-    //    }
 
     /**
      * @return Collection<int, User>
@@ -228,6 +197,6 @@ class Meetup
 
     public function __toString(): string
     {
-        return $this->getLabel() ?? '';
+        return $this->getName() ?? '';
     }
 }
