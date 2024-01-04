@@ -22,8 +22,8 @@ class Topic
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $label = null;
+    #[ORM\Column]
+    private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
@@ -31,7 +31,7 @@ class Topic
     #[ORM\Column(nullable: true)]
     private ?\DateInterval $duration = null;
 
-    #[ORM\Column(length: 255, nullable: true, enumType: durationCategory::class)]
+    #[ORM\Column(nullable: true, enumType: durationCategory::class)]
     private ?durationCategory $durationCategory = null;
 
     #[ORM\Column]
@@ -60,13 +60,9 @@ class Topic
     #[ORM\JoinTable(name: 'topics_users_vote')]
     private Collection $users;
 
-    //    #[ORM\OneToMany(mappedBy: 'topic', targetEntity: UserTopicVote::class, orphanRemoval: true)]
-    //    private Collection $userTopicVotes;
-
     public function __construct()
     {
         $this->users = new ArrayCollection();
-        //        $this->userTopicVotes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -74,14 +70,14 @@ class Topic
         return $this->id;
     }
 
-    public function getLabel(): ?string
+    public function getName(): ?string
     {
-        return $this->label;
+        return $this->name;
     }
 
-    public function setLabel(?string $label): self
+    public function setName(?string $name): self
     {
-        $this->label = $label;
+        $this->name = $name;
 
         return $this;
     }
@@ -103,44 +99,9 @@ class Topic
         return $this->duration;
     }
 
-    public function getDurationAsString(): ?string
-    {
-        return $this->duration?->format('%h hours %i minutes');
-    }
-
-    public function getDurationAsArray(): ?array
-    {
-        if (!$this->duration instanceof \DateInterval) {
-            return null;
-        }
-
-        return [
-            'hours' => $this->duration->h,
-            'minutes' => $this->duration->i,
-        ];
-    }
-
     public function setDuration(?\DateInterval $duration): self
     {
         $this->duration = $duration;
-
-        return $this;
-    }
-
-    public function setDurationAsString(\DateInterval|string|array|null $duration): self
-    {
-        if ($duration instanceof \DateInterval) {
-            $this->duration = $duration;
-        } elseif (is_string($duration)) {
-            $parts = explode(' ', $duration);
-            $hours = (int)$parts[0];
-            $minutes = (int)$parts[2];
-            $this->duration = new \DateInterval(sprintf('PT%dH%dM', $hours, $minutes));
-        } elseif (is_array($duration) && isset($duration['hours'], $duration['minutes'])) {
-            $this->duration = new \DateInterval(sprintf('PT%dH%dM', $duration['hours'], $duration['minutes']));
-        } else {
-            throw new \InvalidArgumentException('Invalid duration value');
-        }
 
         return $this;
     }
@@ -246,34 +207,6 @@ class Topic
         return $this;
     }
 
-    //    /**
-    //     * @return Collection<int, UserTopicVote>
-    //     */
-    //    public function getUserTopicVotes(): Collection
-    //    {
-    //        return $this->userTopicVotes;
-    //    }
-    //
-    //    public function addUserTopicVote(UserTopicVote $userTopicVote): self
-    //    {
-    //        if (!$this->userTopicVotes->contains($userTopicVote)) {
-    //            $this->userTopicVotes->add($userTopicVote);
-    //            $userTopicVote->setTopic($this);
-    //        }
-    //
-    //        return $this;
-    //    }
-    //
-    //    public function removeUserTopicVote(UserTopicVote $userTopicVote): self
-    //    {
-    //        // set the owning side to null (unless already changed)
-    //        if ($this->userTopicVotes->removeElement($userTopicVote) && $userTopicVote->getTopic() === $this) {
-    //            $userTopicVote->setTopic(null);
-    //        }
-    //
-    //        return $this;
-    //    }
-
     /**
      * @return Collection<int, User>
      */
@@ -300,6 +233,6 @@ class Topic
 
     public function __toString(): string
     {
-        return sprintf("%s - %s", $this->getLabel(), $this->getDescription()) ?? '';
+        return sprintf("%s - %s", $this->getName(), $this->getDescription()) ?? '';
     }
 }

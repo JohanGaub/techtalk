@@ -67,7 +67,7 @@ class TopicControllerTest extends WebTestCase
     {
         $this->markTestIncomplete();
         $fixture = new Topic();
-        $fixture->setLabel('My Title');
+        $fixture->setName('My Title');
         $fixture->setCurrentPlace('My Title');
         $fixture->setInReviewAt('My Title');
         $fixture->setUserProposer('My Title');
@@ -89,7 +89,7 @@ class TopicControllerTest extends WebTestCase
     {
         $this->markTestIncomplete();
         $fixture = new Topic();
-        $fixture->setLabel('Value');
+        $fixture->setName('Value');
         $fixture->setCurrentPlace('Value');
         $fixture->setInReviewAt('Value');
         $fixture->setUserProposer('Value');
@@ -126,7 +126,7 @@ class TopicControllerTest extends WebTestCase
     {
         $this->markTestIncomplete();
         $fixture = new Topic();
-        $fixture->setLabel('Value');
+        $fixture->setName('Value');
         $fixture->setCurrentPlace('Value');
         $fixture->setInReviewAt('Value');
         $fixture->setUserProposer('Value');
