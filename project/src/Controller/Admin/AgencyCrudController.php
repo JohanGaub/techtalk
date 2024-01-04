@@ -24,7 +24,7 @@ class AgencyCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->hideOnForm(),
-            TextField::new('label'),
+            TextField::new('name'),
             /**
              * It displays the number of meetups for each agency in the index page.
              */

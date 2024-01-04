@@ -27,7 +27,7 @@ class TopicType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('label')
+            ->add('name')
             ->add('description')
             ->add('duration', DateIntervalType::class, [
                 'widget' => 'choice',
@@ -55,7 +55,7 @@ class TopicType extends AbstractType
             ])
             ->add('meetup', EntityType::class, [
                 'class' => Meetup::class,
-                'choice_label' => 'label',
+                'choice_label' => 'name',
                 'required' => false,
                 'placeholder' => 'Select a meetup',
             ]);

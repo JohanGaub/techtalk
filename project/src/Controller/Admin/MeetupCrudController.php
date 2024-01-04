@@ -27,7 +27,7 @@ class MeetupCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->hideOnForm(),
-            TextField::new('label'),
+            TextField::new('name'),
             TextareaField::new('description'),
             DateField::new('startDate'),
             DateField::new('endDate'),
@@ -35,7 +35,7 @@ class MeetupCrudController extends AbstractCrudController
             AssociationField::new('agency')
                 ->autocomplete()
                 ->formatValue(static function ($value) {
-                    return $value ? $value->getLabel() : '';
+                    return $value ? $value->getName() : '';
                 }),
             AssociationField::new('userOrganiser')
                 ->autocomplete()

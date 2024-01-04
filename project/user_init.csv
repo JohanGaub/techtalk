@@ -1,7 +1,7 @@
-"email","fisrt_name","last_name","roles","agency","enabled"
-"admin02@gmail.com","Admin","Deux",ROLE_ADMIN,"1","0"
-"admin03@gmail.com","Admin","Trois",ROLE_ADMIN,"2","0"
-"user01@gmail.com","User","Un",ROLE_USER,"1","0"
-"user02@gmail.com","User","Deux",ROLE_USER,"2","0"
-"user_board01@gmail.com","User_board","Un","ROLE_USER,ROLE_BOARD_USER","1","0"
-"user_board02@gmail.com","User_board","Deux","ROLE_BOARD_USER","2","0"
+"email","first_name","last_name","roles","agency","enabled"
+"admin01@gmail.com","Admin","Un",ROLE_ADMIN,"1",0
+"admin02@gmail.com","Admin","Deux",ROLE_ADMIN,"2",0
+"user01@gmail.com","User","Un",ROLE_USER,"1",0
+"user02@gmail.com","User","Deux",ROLE_USER,"2",0
+board_user01@gmail.com,"Board_user","Un","ROLE_BOARD_USER","1",0
+board_user02@gmail.com,"Board_user","Deux","ROLE_BOARD_USER","2",0
