@@ -40,7 +40,7 @@ class UserService
                 $user->setLastName($data[2]);
                 $user->setRoles(explode(",", $data[3]));
                 $user->setAgency($this->getAgencyById($data[4]));
-                $user->setEnabled($data[5]);
+                $user->setEnabled((bool) $data[5]);
                 // Set a default password because when creating user it is needed even if we don't use it.
                 // Indeed, we use the login link feature to connect to the website.
                 $user->setPassword(password_hash('default_password', PASSWORD_BCRYPT));

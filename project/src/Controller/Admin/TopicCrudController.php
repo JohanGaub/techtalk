@@ -30,7 +30,7 @@ class TopicCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->hideOnForm(),
-            TextField::new('label'),
+            TextField::new('name'),
             TextareaField::new('description'),
             DateIntervalField::new('duration', 'Duration')
                 ->setFormType(DateIntervalType::class)
@@ -59,7 +59,7 @@ class TopicCrudController extends AbstractCrudController
             AssociationField::new('meetup')
                 ->autocomplete()
                 ->formatValue(static function ($value) {
-                    return $value ? $value->getLabel() : '';
+                    return $value ? $value->getName() : '';
                 }),
             AssociationField::new('userProposer')
                 ->autocomplete()

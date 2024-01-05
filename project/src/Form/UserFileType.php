@@ -37,6 +37,7 @@ class UserFileType extends AbstractType
                 [
                     'label' => 'Upload',
                 ]
-            );
+            )
+        ;
     }
 }

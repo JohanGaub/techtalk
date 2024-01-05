@@ -40,7 +40,7 @@ class UserCrudController extends AbstractCrudController
             AssociationField::new('agency')
                 ->autocomplete()
                 ->formatValue(static function ($value) {
-                    return $value ? $value->getLabel() : '';
+                    return $value ? $value->getName() : '';
                 })
             ,
             AssociationField::new('proposedTopics')->onlyOnIndex(),
