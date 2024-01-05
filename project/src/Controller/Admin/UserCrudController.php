@@ -4,16 +4,25 @@ namespace App\Controller\Admin;
 
 use App\Controller\Admin\Trait\DetailTrait;
 use App\Entity\User;
+use App\Service\LoginLinkService;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class UserCrudController extends AbstractCrudController
 {
     use DetailTrait;
+
+    public function __construct(private readonly LoginLinkService $loginLinkService)
+    {
+    }
 
     public static function getEntityFqcn(): string
     {
@@ -58,4 +67,37 @@ class UserCrudController extends AbstractCrudController
             ArrayField::new('organisedMeetups')->onlyOnDetail(),
         ];
     }
+
+    /**
+     * Batch action used in configureActions() method to send login link to users.
+     */
+    public function sendLoginLinkToUsers(BatchActionDto $batchActionDto): RedirectResponse
+    {
+        $className = $batchActionDto->getEntityFqcn();
+        $entityManager = $this->container->get('doctrine')->getManagerForClass($className);
+
+        foreach ($batchActionDto->getEntityIds() as $id) {
+            $user = $entityManager->find($className, $id);
+            $this->loginLinkService->sendLoginLink($user->getEmail());
+        }
+
+        $this->addFlash('success', 'Login links sent successfully.');
+
+        return $this->redirect($batchActionDto->getReferrerUrl());
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        $sendLoginLinkToUsers = Action::new('sendLoginLinkToUsers', 'Send Login Link to users')
+            ->linkToCrudAction('sendLoginLinkToUsers')
+            ->addCssClass('btn btn-primary')
+            ->setIcon('fa-solid fa-handshake')
+        ;
+
+        return $actions
+            ->addBatchAction($sendLoginLinkToUsers)
+        ;
+    }
+
+
 }

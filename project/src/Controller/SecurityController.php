@@ -8,6 +8,7 @@ use App\Form\LoginCheckType;
 use App\Form\UserFileType;
 use App\Repository\UserRepository;
 use App\Service\FileUploader;
+use App\Service\LoginLinkService;
 use App\Service\UserService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,6 +19,7 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Http\LoginLink\Exception\ExpiredLoginLinkException;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
@@ -31,45 +33,18 @@ class SecurityController extends AbstractController
 
     #[Route('/login_link', name: 'login_link', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function loginLink(
-        NotifierInterface $notifier,
-        LoginLinkHandlerInterface $loginLinkHandler,
-        UserRepository $userRepository,
-        Request $request
+        LoginLinkService $loginLinkService,
+        Request          $request
     ): Response {
         // check if login form is submitted
         if ($request->isMethod(Request::METHOD_POST)) {
-            $email = $request->request->get('email');
-            $user = $userRepository->findOneBy(['email' => $email]);
+            $postedEmail = $request->request->get('email');
 
-            if (null === $user) {
-                throw new UserNotFoundException('User not found');
-            }
-
-            try {
-                // create a login link for $user this returns an instance of LoginLinkDetails
-                $loginLinkDetails = $loginLinkHandler->createLoginLink($user);
-
-                // create a notification based on the login link details
-                $notification = new LoginLinkNotification(
-                    $loginLinkDetails,
-                    'Link to connect to Techtalk website!' // email subject
-                );
-
-                // create a recipient for this user
-                $userEmail = $user->getEmail();
-                $recipient = new Recipient($userEmail);
-
-                // send the notification to the user
-                $notifier->send($notification, $recipient);
-            } catch (ExpiredLoginLinkException $e) {
-                return new Response('Login link has expired');
-            } catch (TransportExceptionInterface $e) {
-                return new Response('Failed to send email');
-            }
+            $loginLinkService->sendLoginLink($postedEmail);
 
             // render a "Login link is sent!" page
             return $this->render('security/login_link_sent.html.twig', [
-                'user_email' => $userEmail,
+                'user_email' => $postedEmail,
             ]);
         }
 
@@ -82,11 +57,11 @@ class SecurityController extends AbstractController
 
     #[Route('/login_links', name: 'login_links', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function loginLinks(
-        NotifierInterface $notifier,
+        NotifierInterface         $notifier,
         LoginLinkHandlerInterface $loginLinkHandler,
-        UserRepository $userRepository,
-        LoggerInterface $logger,
-        Request $request
+        UserRepository            $userRepository,
+        LoggerInterface           $logger,
+        Request                   $request
     ): Response {
         $processedEmails = [];
 
@@ -112,7 +87,8 @@ class SecurityController extends AbstractController
                     // If the email is sent successfully, add it to the output array with a success status
                     $processedEmails[self::STATUS_SUCCESS][] = ['email' => $userEmail];
                 } catch (ExpiredLoginLinkException|TransportExceptionInterface $e) {
-                    // If the link is expired or has a transport exception, log the error and add the email to the output array with a failure status
+                    // If the link is expired or has a transport exception,
+                    // log the error and add the email to the output array with a failure status
                     $logger->error(sprintf('Failed to send login link to %s: %s', $userEmail, $e->getMessage()));
                     $processedEmails[self::STATUS_FAILURE][] = ['email' => $userEmail, 'error' => $e->getMessage()];
                 }
@@ -146,7 +122,8 @@ class SecurityController extends AbstractController
         ]);
 
         // render a template with the button
-        // see https://symfony.com/doc/current/forms.html#rendering-forms : from SF 6.2, render() method calls $form->createView() to transform the form into a form view instance.
+        // see https://symfony.com/doc/current/forms.html#rendering-forms :
+        // from SF 6.2, render() method calls $form->createView() to transform the form into a form view instance.
         return $this->render('security/process_login_link.html.twig', [
             'form' => $form,
         ]);
@@ -154,9 +131,9 @@ class SecurityController extends AbstractController
 
     #[Route('/upload_users', name: 'upload_users', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function uploadUsers(
-        Request $request,
+        Request      $request,
         FileUploader $fileUploaderService,
-        UserService $userService
+        UserService  $userService
     ): Response {
         $form = $this->createForm(UserFileType::class);
 
@@ -180,7 +157,8 @@ class SecurityController extends AbstractController
             ]);
         }
 
-        // see https://symfony.com/doc/current/forms.html#rendering-forms : from SF 6.2, render() method calls $form->createView() to transform the form into a form view instance.
+        // see https://symfony.com/doc/current/forms.html#rendering-forms :
+        // from SF 6.2, render() method calls $form->createView() to transform the form into a form view instance.
         return $this->render('security/upload_users.html.twig', [
             'upload_form' => $form,
         ]);
@@ -193,6 +171,6 @@ class SecurityController extends AbstractController
     public function logout(): never
     {
         // controller can be blank: it will never be called!
-        throw new \Exception("Don't forget to activate logout in security.yaml");
+        throw new AccessDeniedException("Don't forget to activate logout in security.yaml");
     }
 }

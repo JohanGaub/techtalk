@@ -14,14 +14,14 @@ use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\WorkflowInterface;
 
-class TopicService
+readonly class TopicService
 {
     public function __construct(
         #[Target('topic_publishing')]
-        private readonly WorkflowInterface $workflow,
-        private readonly TopicRepository $topicRepository,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly Security $security
+        private WorkflowInterface      $workflow,
+        private TopicRepository        $topicRepository,
+        private EntityManagerInterface $entityManager,
+        private Security               $security
     ) {
     }
 
@@ -76,7 +76,14 @@ class TopicService
         } catch (LogicException $logicException) {
             // Throw a custom exception here and handle this in your controller,
             // to show an error message to the user
-            throw new TopicStateException(sprintf('Cannot change the state of the topic, because %s', $logicException->getMessage()), 0, $logicException);
+            throw new TopicStateException(
+                sprintf(
+                    'Cannot change the state of the topic, because %s',
+                    $logicException->getMessage()
+                ),
+                0,
+                $logicException
+            );
         }
     }
 }

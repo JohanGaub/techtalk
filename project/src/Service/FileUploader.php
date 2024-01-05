@@ -9,12 +9,12 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-class FileUploader
+readonly class FileUploader
 {
     public function __construct(
-        private readonly string $userDirectory,
-        private readonly SluggerInterface $slugger,
-        private readonly LoggerInterface $logger
+        private string           $userDirectory,
+        private SluggerInterface $slugger,
+        private LoggerInterface  $logger
     ) {
     }
 
@@ -31,7 +31,7 @@ class FileUploader
             $file->move($this->userDirectory, $fileName);
         } catch (FileException $fileException) {
             $this->logger->error(sprintf('Failed to upload file %s: %s', $fileName, $fileException->getMessage()));
-            //            TODO: save errors in a variable OUTPUT AND, in the controller, use addFlashmessage to show errors.
+            // TODO: save errors in a variable OUTPUT AND, in the controller, use addFlashmessage to show errors.
         }
 
         return $fileName;
