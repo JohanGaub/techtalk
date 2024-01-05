@@ -9,12 +9,12 @@ use App\Entity\User;
 use App\Repository\AgencyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
-class UserService
+readonly class UserService
 {
     public function __construct(
-        private readonly string $userDirectory,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly AgencyRepository $agencyRepository,
+        private string                 $userDirectory,
+        private EntityManagerInterface $entityManager,
+        private AgencyRepository       $agencyRepository,
     ) {
     }
 
@@ -74,4 +74,6 @@ class UserService
     {
         return $this->agencyRepository->find($id);
     }
+
+
 }
