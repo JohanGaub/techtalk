@@ -27,15 +27,44 @@ trait DetailTrait
         return $actions
             /**
              * In PAGE_INDEX :
-             * - Add Action::DETAIL to show the detail page
+             * - Add Action::DETAIL to show the detail page AND use an icon instead of a label
+             * - For Action::EDIT, use an icon instead of a label
+             * - For Action::DELETE, use an icon instead of a label
              * - For Action::NEW, use an icon instead of a label
+             * - For Action::NEW, use an icon instead of a label
+             * - For Action::NEW, use an icon instead of a label
+             * - For BatchAction::DELETE, use an icon instead of a label
              */
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->update(
+                Crud::PAGE_INDEX,
+                Action::DETAIL,
+                static fn (Action $action)
+                => $action->setIcon(self::ACTION_SHOW_ICON)->setLabel(false)
+            )
+            ->update(
+                Crud::PAGE_INDEX,
+                Action::EDIT,
+                static fn (Action $action)
+                => $action->setIcon(self::ACTION_EDIT_ICON)->setLabel(false)
+            )
+            ->update(
+                Crud::PAGE_INDEX,
+                Action::DELETE,
+                static fn (Action $action)
+                => $action->setIcon(self::ACTION_DELETE_ICON)->setLabel(false)
+            )
             ->update(
                 Crud::PAGE_INDEX,
                 Action::NEW,
                 static fn (Action $action)
                 => $action->setIcon(self::ACTION_NEW_ICON)->setLabel(false)
+            )
+            ->update(
+                Crud::PAGE_INDEX,
+                Action::BATCH_DELETE,
+                static fn (Action $action)
+                => $action->setIcon(self::ACTION_DELETE_ICON)->setLabel(false)
             )
             /**
              * In PAGE_NEW :
