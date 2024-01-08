@@ -8,6 +8,7 @@ use App\Controller\Admin\Trait\DetailTrait;
 use App\Entity\Topic;
 use App\Enum\DurationCategory;
 use App\Field\DateIntervalField;
+use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -20,6 +21,9 @@ use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
 class TopicCrudController extends AbstractCrudController
 {
     use DetailTrait;
+    public function __construct(private readonly ManagerRegistry $managerRegistry)
+    {
+    }
 
     public static function getEntityFqcn(): string
     {
@@ -49,7 +53,7 @@ class TopicCrudController extends AbstractCrudController
                         'minutes' => 'Minutes'
                     ],
                 ])
-              ,
+            ,
             ChoiceField::new('durationCategory')->setChoices(DurationCategory::cases()),
             ChoiceField::new('currentPlace')->setChoices([
                 'Draft' => 'draft',
