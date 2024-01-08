@@ -10,6 +10,7 @@ use App\Enum\DurationCategory;
 use App\Field\DateIntervalField;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
@@ -62,27 +63,30 @@ class TopicCrudController extends AbstractCrudController
             ]),
             AssociationField::new('meetup')
                 ->autocomplete()
-                ->formatValue(static function ($value) {
-                    return $value ? $value->getName() : '';
-                }),
+                ->formatValue(static fn ($value) =>  $value ? $value->getName() : ''),
             AssociationField::new('userProposer')
                 ->autocomplete()
-                ->formatValue(static function ($value) {
-                    return $value ? $value->getEmail() : '';
-                }),
+                ->formatValue(static fn ($value) =>  $value ? $value->getEmail() : ''),
             AssociationField::new('userPresenter')
                 ->autocomplete()
-                ->formatValue(static function ($value) {
-                    return $value ? $value->getEmail() : '';
-                }),
+                ->formatValue(static fn ($value) =>  $value ? $value->getEmail() : ''),
             AssociationField::new('userPublisher')
                 ->autocomplete()
-                ->formatValue(static function ($value) {
-                    return $value ? $value->getEmail() : '';
-                })->hideOnForm(),
+                ->formatValue(static fn ($value) =>  $value ? $value->getEmail() : '')
+                ->hideOnForm(),
             DateTimeField::new('inReviewAt')->hideOnForm(),
             DateTimeField::new('publishedAt')->hideOnForm(),
             DateTimeField::new('updatedAt')->hideOnForm(),
+            /**
+             * In Page::NEW and Page::EDIT, it enables to select users voting to this specific topic.
+             * In Page::INDEX, it displays the number of users' votes for any specific topic.
+             */
+            AssociationField::new('users', "Number of votes")
+                ->autocomplete(),
+            /**
+             * In Page::DETAIL, it displays all users' votes for the selected topic.
+             */
+            ArrayField::new('users', "Users' votes")->onlyOnDetail(),
         ];
     }
 }

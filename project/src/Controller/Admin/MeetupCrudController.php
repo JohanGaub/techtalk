@@ -34,14 +34,10 @@ class MeetupCrudController extends AbstractCrudController
             IntegerField::new('capacity'),
             AssociationField::new('agency')
                 ->autocomplete()
-                ->formatValue(static function ($value) {
-                    return $value ? $value->getName() : '';
-                }),
+                ->formatValue(static fn ($value) =>  $value ? $value->getName() : ''),
             AssociationField::new('userOrganiser')
                 ->autocomplete()
-                ->formatValue(static function ($value) {
-                    return $value ? $value->getEmail() : '';
-                }),
+                ->formatValue(static fn ($value) =>  $value ? $value->getEmail() : ''),
             /**
              * It displays the number of topics for each meetup in the index page.
              */
@@ -50,6 +46,16 @@ class MeetupCrudController extends AbstractCrudController
              * It displays all topics made in meetup's detail page.
              */
             ArrayField::new('topics')->onlyOnDetail(),
+            /**
+             * In Page::NEW and Page::EDIT, it enables to select user participants to this specific meetup.
+             * In Page::INDEX, it displays the number of participants for any specific meetup.
+             */
+            AssociationField::new('users', 'Number of participants')
+                ->autocomplete(),
+            /**
+             * In Page::DETAIL, it displays all participants for the selected meetup.
+             */
+            ArrayField::new('users', 'Particpants')->onlyOnDetail(),
         ];
     }
 }
