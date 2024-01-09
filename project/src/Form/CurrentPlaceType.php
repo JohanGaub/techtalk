@@ -13,17 +13,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CurrentPlaceType extends AbstractType
 {
+    private const BUTTON_PRIMARY = 'btn btn-primary';
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('draft', ButtonType::class, [
-                'attr' => ['class' => 'btn btn-primary'],
+                'attr' => ['class' => self::BUTTON_PRIMARY],
             ])
             ->add('in_review', ButtonType::class, [
-                'attr' => ['class' => 'btn btn-primary'],
+                'attr' => ['class' => self::BUTTON_PRIMARY],
             ])
             ->add('publish', ButtonType::class, [
-                'attr' => ['class' => 'btn btn-primary'],
+                'attr' => ['class' => self::BUTTON_PRIMARY],
             ]);
         //            ->add('currentPlace', ButtonType::class, [
         //                'placeholder' => 'Select a current place',

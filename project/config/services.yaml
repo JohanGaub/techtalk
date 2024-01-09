@@ -4,7 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    user_directory: '%kernel.project_dir%/asset/upload/user'
+    user_directory: '%kernel.project_dir%/assets/upload/user'
     current_place_draft: !php/enum App\Enum\CurrentPlace::DRAFT->value
     current_place_in_review: !php/enum App\Enum\CurrentPlace::IN_REVIEW->value
     current_place_published: !php/enum App\Enum\CurrentPlace::PUBLISHED->value
@@ -36,8 +36,3 @@ services:
     App\EventListener\LoginRedirectListener:
         arguments:
             - '@router'
-
-    App\DataTransformer\ArrayToDateIntervalTransformer:
-        autowire: true
-        autoconfigure: true
-        public: false

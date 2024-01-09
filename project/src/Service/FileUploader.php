@@ -31,7 +31,6 @@ readonly class FileUploader
             $file->move($this->userDirectory, $fileName);
         } catch (FileException $fileException) {
             $this->logger->error(sprintf('Failed to upload file %s: %s', $fileName, $fileException->getMessage()));
-            // TODO: save errors in a variable OUTPUT AND, in the controller, use addFlashmessage to show errors.
         }
 
         return $fileName;

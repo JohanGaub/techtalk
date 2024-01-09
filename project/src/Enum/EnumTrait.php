@@ -21,26 +21,4 @@ trait EnumTrait
     {
         return array_map(static fn ($enum) => $enum->name, self::cases());
     }
-
-    //    /**
-    //     * @throws \ReflectionException
-    //     */
-    //    public static function makeEnumByCase(string $name): ?static {
-    //        $reflection = new \ReflectionEnum(self::class);
-    //        /** @phpstan-ignore-next-line */
-    //        if ($reflection->hasCase($name)) {
-    //            /** @phpstan-ignore-next-line */
-    //            return $reflection->getCase($name)->getValue();
-    //        }
-    //
-    //        return null;
-    //    }
-    //
-    //    public static function values(): array {
-    //        return array_column(self::cases(), 'value');
-    //    }
-    //
-    //    public static function names(): array {
-    //        return array_column(self::cases(), 'name');
-    //    }
 }
