@@ -105,7 +105,12 @@ class TopicController extends AbstractController
     #[Route('/{id}/{transitionName}', name: 'do_transition', methods: [Request::METHOD_POST])]
     public function doTransition(Request $request, Topic $topic, string $transitionName): Response
     {
-        if ($this->isCsrfTokenValid(sprintf('%s%d', $transitionName, $topic->getId()), $request->request->get('_token'))) {
+        if (
+            $this->isCsrfTokenValid(
+                sprintf('%s%d', $transitionName, $topic->getId()),
+                $request->request->get('_token')
+            )
+        ) {
             $this->workflow->apply($topic, $transitionName);
             $this->entityManager->flush();
         }
