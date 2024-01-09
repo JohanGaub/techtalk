@@ -41,7 +41,6 @@ readonly class TopicService
         $topic->setInReviewAt(new \DateTimeImmutable());
 
         $this->entityManager->persist($topic);
-        //        $this->entityManager->flush();
     }
 
     public function publish(Topic $topic): void
@@ -52,7 +51,6 @@ readonly class TopicService
         $topic->setUserPublisher($this->security->getUser());
 
         $this->entityManager->persist($topic);
-        //        $this->entityManager->flush();
     }
 
     public function rejectToDraft(Topic $topic): void
@@ -62,7 +60,6 @@ readonly class TopicService
         $topic->setUserPublisher(null);
 
         $this->entityManager->persist($topic);
-        //        $this->entityManager->flush();
     }
 
 
