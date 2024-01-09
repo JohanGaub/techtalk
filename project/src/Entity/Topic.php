@@ -22,8 +22,8 @@ class Topic
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $label = null;
+    #[ORM\Column]
+    private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
@@ -31,14 +31,14 @@ class Topic
     #[ORM\Column(nullable: true)]
     private ?\DateInterval $duration = null;
 
-    #[ORM\Column(length: 255, nullable: true, enumType: durationCategory::class)]
+    #[ORM\Column(nullable: true, enumType: durationCategory::class)]
     private ?durationCategory $durationCategory = null;
 
     #[ORM\Column]
     private string $currentPlace;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $reviewedAt = null;
+    private ?\DateTimeImmutable $inReviewAt = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $publishedAt = null;
@@ -47,8 +47,8 @@ class Topic
     #[ORM\JoinColumn(nullable: false)]
     private ?User $userProposer = null;
 
-    #[ORM\ManyToOne(inversedBy: 'reviewedTopics')]
-    private ?User $userReviewer = null;
+    #[ORM\ManyToOne(inversedBy: 'publishedTopics')]
+    private ?User $userPublisher = null;
 
     #[ORM\ManyToOne(inversedBy: 'presentedTopics')]
     private ?User $userPresenter = null;
@@ -56,12 +56,13 @@ class Topic
     #[ORM\ManyToOne(inversedBy: 'topics')]
     private ?Meetup $meetup = null;
 
-    #[ORM\OneToMany(mappedBy: 'topic', targetEntity: UserTopicVote::class, orphanRemoval: true)]
-    private Collection $userTopicVotes;
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'topics')]
+    #[ORM\JoinTable(name: 'topics_users_vote')]
+    private Collection $users;
 
     public function __construct()
     {
-        $this->userTopicVotes = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -69,14 +70,14 @@ class Topic
         return $this->id;
     }
 
-    public function getLabel(): ?string
+    public function getName(): ?string
     {
-        return $this->label;
+        return $this->name;
     }
 
-    public function setLabel(?string $label): self
+    public function setName(?string $name): self
     {
-        $this->label = $label;
+        $this->name = $name;
 
         return $this;
     }
@@ -134,14 +135,14 @@ class Topic
         return $this;
     }
 
-    public function getReviewedAt(): ?\DateTimeImmutable
+    public function getInReviewAt(): ?\DateTimeImmutable
     {
-        return $this->reviewedAt;
+        return $this->inReviewAt;
     }
 
-    public function setReviewedAt(?\DateTimeImmutable $reviewedAt): self
+    public function setInReviewAt(?\DateTimeImmutable $inReviewAt): self
     {
-        $this->reviewedAt = $reviewedAt;
+        $this->inReviewAt = $inReviewAt;
 
         return $this;
     }
@@ -170,14 +171,14 @@ class Topic
         return $this;
     }
 
-    public function getUserReviewer(): ?User
+    public function getUserPublisher(): ?User
     {
-        return $this->userReviewer;
+        return $this->userPublisher;
     }
 
-    public function setUserReviewer(?User $userReviewer): self
+    public function setUserPublisher(?User $userPublisher): self
     {
-        $this->userReviewer = $userReviewer;
+        $this->userPublisher = $userPublisher;
 
         return $this;
     }
@@ -207,30 +208,31 @@ class Topic
     }
 
     /**
-     * @return Collection<int, UserTopicVote>
+     * @return Collection<int, User>
      */
-    public function getUserTopicVotes(): Collection
+    public function getUsers(): Collection
     {
-        return $this->userTopicVotes;
+        return $this->users;
     }
 
-    public function addUserTopicVote(UserTopicVote $userTopicVote): self
+    public function addUser(User $user): static
     {
-        if (!$this->userTopicVotes->contains($userTopicVote)) {
-            $this->userTopicVotes->add($userTopicVote);
-            $userTopicVote->setTopic($this);
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
         }
 
         return $this;
     }
 
-    public function removeUserTopicVote(UserTopicVote $userTopicVote): self
+    public function removeUser(User $user): static
     {
-        // set the owning side to null (unless already changed)
-        if ($this->userTopicVotes->removeElement($userTopicVote) && $userTopicVote->getTopic() === $this) {
-            $userTopicVote->setTopic(null);
-        }
+        $this->users->removeElement($user);
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return sprintf("%s - %s", $this->getName(), $this->getDescription()) ?? '';
     }
 }

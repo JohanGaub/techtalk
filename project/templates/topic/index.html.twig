@@ -23,7 +23,7 @@
             {# ROLE_BOARD_USER part ########################################## START #}
             {% if is_granted('ROLE_BOARD_USER') %}
                 <th>UserProposer</th>
-                <th>UserReviewer</th>
+                <th>UserPublisher</th>
                 <th>ReviewedAt</th>
                 <th>PublishedAt</th>
             {% endif %}
@@ -51,8 +51,8 @@
                 {# ROLE_BOARD_USER part ########################################## START #}
                 {% if is_granted('ROLE_BOARD_USER') %}
                     <td>{{ topic.userProposer ? topic.userProposer.email : '' }}</td>
-                    <td>{{ topic.userReviewer ? topic.userReviewer.email : '' }}</td>
-                    <td>{{ topic.reviewedAt ? topic.reviewedAt|date('Y-m-d H:i:s') : '' }}</td>
+                    <td>{{ topic.userPublisher ? topic.userPublisher.email : '' }}</td>
+                    <td>{{ topic.inReviewAt? topic.inReviewAt|date('Y-m-d H:i:s') : '' }}</td>
                     <td>{{ topic.publishedAt ? topic.publishedAt|date('Y-m-d H:i:s') : '' }}</td>
                 {% endif %}
                 {# ROLE_BOARD_USER part ########################################## END #}
@@ -64,10 +64,12 @@
                     {{ include('topic/_delete_form.html.twig') }}
 
                     {% for transition in workflow_transitions(topic) %}
-                        <form method="post" action="{{ path('topic_' ~ transition.name, {'id': topic.id, 'transition': transition}) }}">
-                            <input type="hidden" name="_token" value="{{ csrf_token(transition.name ~ topic.id) }}">
-                            <button type="submit">{{ transition.name }}</button>
-                        </form>
+                        {% if transition.name != 'publish' or (transition.name == 'publish' and app.user != topic.userProposer) %}
+                            <form method="post" action="{{ path('topic_do_transition', {'id': topic.id, 'transitionName': transition.name}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token(transition.name ~ topic.id) }}">
+                                <button type="submit">{{ transition.name }}</button>
+                            </form>
+                        {% endif %}
                     {% endfor %}
                 </td>
             </tr>

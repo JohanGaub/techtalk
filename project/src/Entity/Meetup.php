@@ -19,8 +19,8 @@ class Meetup
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $label = null;
+    #[ORM\Column]
+    private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
@@ -37,19 +37,20 @@ class Meetup
     #[ORM\ManyToOne(inversedBy: 'meetups')]
     private ?Agency $agency = null;
 
-    #[ORM\ManyToOne(inversedBy: 'meetups')]
-    private ?User $organizer = null;
+    #[ORM\ManyToOne(inversedBy: 'organisedMeetups')]
+    private ?User $userOrganiser = null;
 
     #[ORM\OneToMany(mappedBy: 'meetup', targetEntity: Topic::class)]
     private Collection $topics;
 
-    #[ORM\OneToMany(mappedBy: 'meetup', targetEntity: MeetupUserParticipant::class)]
-    private Collection $userMeetups;
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'meetups')]
+    #[ORM\JoinTable(name: 'meetups_users_participant')]
+    private Collection $users;
 
     public function __construct()
     {
         $this->topics = new ArrayCollection();
-        $this->userMeetups = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -57,14 +58,14 @@ class Meetup
         return $this->id;
     }
 
-    public function getLabel(): ?string
+    public function getName(): ?string
     {
-        return $this->label;
+        return $this->name;
     }
 
-    public function setLabel(string $label): self
+    public function setName(string $name): self
     {
-        $this->label = $label;
+        $this->name = $name;
 
         return $this;
     }
@@ -129,14 +130,14 @@ class Meetup
         return $this;
     }
 
-    public function getOrganizer(): ?User
+    public function getUserOrganiser(): ?User
     {
-        return $this->organizer;
+        return $this->userOrganiser;
     }
 
-    public function setOrganizer(?User $organizer): self
+    public function setUserOrganiser(?User $userOrganiser): self
     {
-        $this->organizer = $organizer;
+        $this->userOrganiser = $userOrganiser;
 
         return $this;
     }
@@ -169,31 +170,33 @@ class Meetup
         return $this;
     }
 
+
     /**
-     * @return Collection<int, MeetupUserParticipant>
+     * @return Collection<int, User>
      */
-    public function getUserMeetups(): Collection
+    public function getUsers(): Collection
     {
-        return $this->userMeetups;
+        return $this->users;
     }
 
-    public function addUserMeetup(MeetupUserParticipant $userMeetup): static
+    public function addUser(User $user): static
     {
-        if (!$this->userMeetups->contains($userMeetup)) {
-            $this->userMeetups->add($userMeetup);
-            $userMeetup->setMeetup($this);
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
         }
 
         return $this;
     }
 
-    public function removeUserMeetup(MeetupUserParticipant $userMeetup): static
+    public function removeUser(User $user): static
     {
-        // set the owning side to null (unless already changed)
-        if ($this->userMeetups->removeElement($userMeetup) && $userMeetup->getMeetup() === $this) {
-            $userMeetup->setMeetup(null);
-        }
+        $this->users->removeElement($user);
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getName() ?? '';
     }
 }

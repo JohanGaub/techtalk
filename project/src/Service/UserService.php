@@ -9,12 +9,12 @@ use App\Entity\User;
 use App\Repository\AgencyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
-class UserService
+readonly class UserService
 {
     public function __construct(
-        private readonly string $userDirectory,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly AgencyRepository $agencyRepository,
+        private string                 $userDirectory,
+        private EntityManagerInterface $entityManager,
+        private AgencyRepository       $agencyRepository,
     ) {
     }
 
@@ -40,7 +40,7 @@ class UserService
                 $user->setLastName($data[2]);
                 $user->setRoles(explode(",", $data[3]));
                 $user->setAgency($this->getAgencyById($data[4]));
-                $user->setEnabled($data[5]);
+                $user->setEnabled((bool) $data[5]);
                 // Set a default password because when creating user it is needed even if we don't use it.
                 // Indeed, we use the login link feature to connect to the website.
                 $user->setPassword(password_hash('default_password', PASSWORD_BCRYPT));
@@ -74,4 +74,6 @@ class UserService
     {
         return $this->agencyRepository->find($id);
     }
+
+
 }
