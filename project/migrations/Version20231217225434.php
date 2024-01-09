@@ -32,7 +32,7 @@ final class Version20231217225434 extends AbstractMigration
                 INDEX IDX_9377E2820AF6010 (user_organiser_id),
                 PRIMARY KEY(id)
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB'
-        );
+        ); // NOSONAR
         $this->addSql(
             'CREATE TABLE meetups_users_participant (
                 meetup_id INT NOT NULL,
@@ -41,7 +41,7 @@ final class Version20231217225434 extends AbstractMigration
                 INDEX IDX_B17FF4FCA76ED395 (user_id),
                 PRIMARY KEY(meetup_id, user_id)
              ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB'
-        );
+        ); // NOSONAR
         $this->addSql(
             'CREATE TABLE topic (
                 id INT AUTO_INCREMENT NOT NULL,
@@ -64,7 +64,7 @@ final class Version20231217225434 extends AbstractMigration
                 INDEX IDX_9D40DE1B591E2316 (meetup_id),
                 PRIMARY KEY(id)
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB'
-        );
+        ); // NOSONAR
         $this->addSql(
             'CREATE TABLE topics_users_vote (
                 topic_id INT NOT NULL,
@@ -73,78 +73,84 @@ final class Version20231217225434 extends AbstractMigration
                 INDEX IDX_30973713A76ED395 (user_id),
                 PRIMARY KEY(topic_id, user_id)
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB'
-        );
+        ); // NOSONAR
         $this->addSql(
             'ALTER TABLE meetup
                     ADD CONSTRAINT FK_9377E28CDEADB2A
                     FOREIGN KEY (agency_id)
                     REFERENCES agency (id)'
-        );
+        ); // NOSONAR
         $this->addSql(
             'ALTER TABLE meetup
                     ADD CONSTRAINT FK_9377E2820AF6010
                     FOREIGN KEY (user_organiser_id)
-                    REFERENCES user (id)');
+                    REFERENCES user (id)'
+        ); // NOSONAR
         $this->addSql(
             'ALTER TABLE meetups_users_participant
                     ADD CONSTRAINT FK_B17FF4FC591E2316
                     FOREIGN KEY (meetup_id)
                     REFERENCES meetup (id) ON DELETE CASCADE'
-        );
+        ); // NOSONAR
         $this->addSql(
             'ALTER TABLE meetups_users_participant
                     ADD CONSTRAINT FK_B17FF4FCA76ED395
                     FOREIGN KEY (user_id)
                     REFERENCES user (id) ON DELETE CASCADE'
-        );
+        ); // NOSONAR
         $this->addSql(
             'ALTER TABLE topic
                     ADD CONSTRAINT FK_9D40DE1B18246FA1
                     FOREIGN KEY (user_proposer_id)
-                    REFERENCES user (id)');
+                    REFERENCES user (id)'
+        ); // NOSONAR
         $this->addSql(
             'ALTER TABLE topic
                     ADD CONSTRAINT FK_9D40DE1BC00413CC
                     FOREIGN KEY (user_publisher_id)
-                    REFERENCES user (id)');
+                    REFERENCES user (id)'
+        ); // NOSONAR
         $this->addSql(
             'ALTER TABLE topic
                     ADD CONSTRAINT FK_9D40DE1B5D28BA37
                     FOREIGN KEY (user_presenter_id)
-                    REFERENCES user (id)');
+                    REFERENCES user (id)'
+        ); // NOSONAR
         $this->addSql(
             'ALTER TABLE topic
                     ADD CONSTRAINT FK_9D40DE1B591E2316
                     FOREIGN KEY (meetup_id)
-                    REFERENCES meetup (id)');
+                    REFERENCES meetup (id)'
+        ); // NOSONAR
         $this->addSql(
             'ALTER TABLE topics_users_vote
                     ADD CONSTRAINT FK_309737131F55203D
                     FOREIGN KEY (topic_id)
                     REFERENCES topic (id) ON DELETE CASCADE'
-        );
+        ); // NOSONAR
         $this->addSql(
             'ALTER TABLE topics_users_vote
                     ADD CONSTRAINT FK_30973713A76ED395
                     FOREIGN KEY (user_id)
-                    REFERENCES user (id) ON DELETE CASCADE');
+                    REFERENCES user (id) ON DELETE CASCADE'
+        ); // NOSONAR
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE meetup DROP FOREIGN KEY FK_9377E28CDEADB2A');
-        $this->addSql('ALTER TABLE meetup DROP FOREIGN KEY FK_9377E2820AF6010');
-        $this->addSql('ALTER TABLE meetups_users_participant DROP FOREIGN KEY FK_B17FF4FC591E2316');
-        $this->addSql('ALTER TABLE meetups_users_participant DROP FOREIGN KEY FK_B17FF4FCA76ED395');
-        $this->addSql('ALTER TABLE topic DROP FOREIGN KEY FK_9D40DE1B18246FA1');
-        $this->addSql('ALTER TABLE topic DROP FOREIGN KEY FK_9D40DE1BC00413CC');
-        $this->addSql('ALTER TABLE topic DROP FOREIGN KEY FK_9D40DE1B5D28BA37');
-        $this->addSql('ALTER TABLE topic DROP FOREIGN KEY FK_9D40DE1B591E2316');
-        $this->addSql('ALTER TABLE topics_users_vote DROP FOREIGN KEY FK_309737131F55203D');
-        $this->addSql('ALTER TABLE topics_users_vote DROP FOREIGN KEY FK_30973713A76ED395');
-        $this->addSql('DROP TABLE meetup');
-        $this->addSql('DROP TABLE meetups_users_participant');
-        $this->addSql('DROP TABLE topic');
-        $this->addSql('DROP TABLE topics_users_vote');
+        $this->addSql('ALTER TABLE meetup DROP FOREIGN KEY FK_9377E28CDEADB2A'); // NOSONAR
+        $this->addSql('ALTER TABLE meetup DROP FOREIGN KEY FK_9377E2820AF6010'); // NOSONAR
+        $this->addSql('ALTER TABLE meetups_users_participant DROP FOREIGN KEY FK_B17FF4FC591E2316'); // NOSONAR
+        $this->addSql('ALTER TABLE meetups_users_participant DROP FOREIGN KEY FK_B17FF4FCA76ED395'); // NOSONAR
+        $this->addSql('ALTER TABLE topic DROP FOREIGN KEY FK_9D40DE1B18246FA1'); // NOSONAR
+        $this->addSql('ALTER TABLE topic DROP FOREIGN KEY FK_9D40DE1BC00413CC'); // NOSONAR
+        $this->addSql('ALTER TABLE topic DROP FOREIGN KEY FK_9D40DE1B5D28BA37'); // NOSONAR
+        $this->addSql('ALTER TABLE topic DROP FOREIGN KEY FK_9D40DE1B591E2316'); // NOSONAR
+        $this->addSql('ALTER TABLE topics_users_vote DROP FOREIGN KEY FK_309737131F55203D'); // NOSONAR
+        $this->addSql('ALTER TABLE topics_users_vote DROP FOREIGN KEY FK_30973713A76ED395'); // NOSONAR
+        $this->addSql('DROP TABLE meetup'); // NOSONAR
+        $this->addSql('DROP TABLE meetups_users_participant'); // NOSONAR
+        $this->addSql('DROP TABLE topic'); // NOSONAR
+        $this->addSql('DROP TABLE topics_users_vote'); // NOSONAR
     }
 }
