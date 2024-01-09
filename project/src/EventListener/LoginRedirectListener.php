@@ -20,7 +20,6 @@ class LoginRedirectListener implements EventSubscriberInterface
         $user = $event->getUser();
 
         if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-            //            $response = new RedirectResponse($this->urlGenerator->generate('admin_home'));
             $response = new RedirectResponse($this->urlGenerator->generate('admin'));
             $event->setResponse($response);
         }
