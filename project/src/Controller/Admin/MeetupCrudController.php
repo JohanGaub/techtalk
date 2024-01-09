@@ -50,12 +50,12 @@ class MeetupCrudController extends AbstractCrudController
              * In Page::NEW and Page::EDIT, it enables to select user participants to this specific meetup.
              * In Page::INDEX, it displays the number of participants for any specific meetup.
              */
-            AssociationField::new('users', 'Number of participants')
+            AssociationField::new('users', 'Participants')
                 ->autocomplete(),
             /**
              * In Page::DETAIL, it displays all participants for the selected meetup.
              */
-            ArrayField::new('users', 'Particpants')->onlyOnDetail(),
+            ArrayField::new('users', 'Participants')->onlyOnDetail(),
         ];
     }
 }
