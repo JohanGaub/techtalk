@@ -1,5 +1,10 @@
 <?php
 
-if (file_exists(dirname(__DIR__).'/var/cache/prod/App_KernelProdContainer.preload.php')) {
-    require dirname(__DIR__).'/var/cache/prod/App_KernelProdContainer.preload.php';
+$containerPreloadFilePath = sprintf(
+    '%s/var/cache/prod/App_KernelProdContainer.preload.php',
+    dirname(__DIR__)
+);
+
+if (file_exists($containerPreloadFilePath)) {
+    require_once $containerPreloadFilePath;
 }
