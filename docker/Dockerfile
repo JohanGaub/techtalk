@@ -25,7 +25,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 # Installation de Symfony CLI
 RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | bash
-RUN apt-get install -y symfony-cli
+RUN apt-get install -y symfony-cli \
+    && apt-get clean
 
 # Installation de l'extension APCu
 RUN pecl install apcu && docker-php-ext-enable apcu
@@ -49,9 +50,10 @@ ENV npm_config_cache=/var/www/project/.npm
 # Définition du répertoire de travail
 WORKDIR /var/www/project/
 
-# Installation de Node.js
+# Installation de Node.js : necessary to compile assets.
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs
+    && apt-get install -y nodejs \
+    && apt-get clean
 
 # Mise à jour de npm à la dernière version
 RUN npm install -g npm@latest

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ea27ed954a89709812a8e3b1e70b7186",
+    "content-hash": "cc0e6aa5b635e288b068b45beb459c6d",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -1456,16 +1456,16 @@
         },
         {
             "name": "easycorp/easyadmin-bundle",
-            "version": "v4.8.8",
+            "version": "v4.8.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EasyCorp/EasyAdminBundle.git",
-                "reference": "a20064f6dd5079c682c512a197cdf7058abaa1f3"
+                "reference": "89991bb68127f7a862d79758eb4fffc8e10a8e73"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/a20064f6dd5079c682c512a197cdf7058abaa1f3",
-                "reference": "a20064f6dd5079c682c512a197cdf7058abaa1f3",
+                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/89991bb68127f7a862d79758eb4fffc8e10a8e73",
+                "reference": "89991bb68127f7a862d79758eb4fffc8e10a8e73",
                 "shasum": ""
             },
             "require": {
@@ -1538,7 +1538,7 @@
             ],
             "support": {
                 "issues": "https://github.com/EasyCorp/EasyAdminBundle/issues",
-                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v4.8.8"
+                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v4.8.9"
             },
             "funding": [
                 {
@@ -1546,7 +1546,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-01-03T18:31:59+00:00"
+            "time": "2024-01-09T18:54:55+00:00"
         },
         {
             "name": "egulias/email-validator",
@@ -9073,21 +9073,21 @@
         },
         {
             "name": "rector/rector",
-            "version": "0.18.13",
+            "version": "0.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "f8011a76d36aa4f839f60f3b4f97707d97176618"
+                "reference": "503f4ead06b3892bd106f67f3c86d4e36c94423d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/f8011a76d36aa4f839f60f3b4f97707d97176618",
-                "reference": "f8011a76d36aa4f839f60f3b4f97707d97176618",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/503f4ead06b3892bd106f67f3c86d4e36c94423d",
+                "reference": "503f4ead06b3892bd106f67f3c86d4e36c94423d",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2|^8.0",
-                "phpstan/phpstan": "^1.10.35"
+                "phpstan/phpstan": "^1.10.52"
             },
             "conflict": {
                 "rector/rector-doctrine": "*",
@@ -9117,7 +9117,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/0.18.13"
+                "source": "https://github.com/rectorphp/rector/tree/0.19.0"
             },
             "funding": [
                 {
@@ -9125,7 +9125,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-20T16:08:01+00:00"
+            "time": "2024-01-09T00:49:06+00:00"
         },
         {
             "name": "sebastian/cli-parser",

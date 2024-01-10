@@ -9,6 +9,7 @@ services:
 
 ###> symfony/mailer ###
   mailer:
-    image: schickling/mailcatcher
+    image: sj26/mailcatcher
+#    image: schickling/mailcatcher ### old image. The new image is coming from the composer symfony/mailer recipe
     ports: ["1025", "1080"]
 ###< symfony/mailer ###

@@ -7,7 +7,7 @@ namespace App\Controller;
 use App\Form\LoginCheckType;
 use App\Form\UserFileType;
 use App\Repository\UserRepository;
-use App\Service\FileUploader;
+use App\Service\FileUploaderService;
 use App\Service\LoginLinkService;
 use App\Service\UserService;
 use Psr\Log\LoggerInterface;
@@ -131,9 +131,9 @@ class SecurityController extends AbstractController
 
     #[Route('/upload_users', name: 'upload_users', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function uploadUsers(
-        Request      $request,
-        FileUploader $fileUploaderService,
-        UserService  $userService
+        Request             $request,
+        FileUploaderService $fileUploaderService,
+        UserService         $userService
     ): Response {
         $form = $this->createForm(UserFileType::class);
 
