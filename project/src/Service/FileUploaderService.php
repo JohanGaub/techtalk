@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -14,7 +14,7 @@ readonly class FileUploaderService
     public function __construct(
         private string           $userDirectory,
         private SluggerInterface $slugger,
-        private LoggerInterface  $logger
+        private LoggerService    $loggerService
     ) {
     }
 
@@ -25,7 +25,31 @@ readonly class FileUploaderService
     {
         $safeFileName = $this->createSafeFileName($file);
 
-        $this->moveFile($file, $safeFileName);
+        try {
+            $this->moveFile($file, $safeFileName);
+        } catch (FileException $fileException) {
+            /**
+             * If moving the file fails, a FileException is thrown.
+             * We catch this exception and log the error message along with the file name.
+             */
+            $this->loggerService->log(
+                LogLevel::ERROR,
+                'Failed to upload file %s.',
+                [$safeFileName],
+                $fileException,
+            );
+
+            /**
+             * Instead of stopping the execution or returning an empty string,
+             * we return a detailed error message to the caller.
+             * This allows the caller to handle the error in a way that makes sense in their context.
+             */
+            return sprintf(
+                'Error uploading the file %s. Error : %s',
+                $safeFileName,
+                $fileException->getMessage()
+            );
+        }
 
         return $safeFileName;
     }
@@ -44,10 +68,11 @@ readonly class FileUploaderService
 
     private function moveFile(UploadedFile $file, string $safeFileName): void
     {
+        $this->loggerService->log(LogLevel::INFO, 'Attempting to upload file: %s.', [$safeFileName]);
+
         try {
-            $this->logger->info(sprintf('Attempting to upload file: %s', $safeFileName));
             $file->move($this->userDirectory, $safeFileName);
-            $this->logger->info(sprintf('File uploaded successfully: %s', $safeFileName));
+            $this->loggerService->log(LogLevel::INFO, 'File uploaded successfully: %s.', [$safeFileName]);
         } catch (FileException $fileException) {
             $errorMessage = sprintf(
                 'Failed to upload file %s to directory %s: %s',
@@ -55,7 +80,16 @@ readonly class FileUploaderService
                 $this->userDirectory,
                 $fileException->getMessage()
             );
-            $this->logger->error($errorMessage);
+
+            $this->loggerService->log(
+                LogLevel::ERROR,
+                'Failed to upload file %s to directory %s: %s',
+                [
+                    $safeFileName,
+                    $this->userDirectory
+                ],
+                $fileException
+            );
 
             /**
              * Include $fileException as the previous exception when creating a new FileException.
