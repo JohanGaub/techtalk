@@ -14,7 +14,7 @@
         </tr>
         <tr>
             <th>Label</th>
-            <td>{{ topic.label }}</td>
+            <td>{{ topic.name }}</td>
         </tr>
         <tr>
             <th>Label</th>
@@ -38,7 +38,7 @@
         </tr>
         <tr>
             <th>Meetup label</th>
-            <td>{{ topic.meetup.label }}</td>
+            <td>{{ topic.meetup.name }}</td>
         </tr>
         <tr>
             <th>StartDate</th>
@@ -50,7 +50,7 @@
         </tr>
         <tr>
             <th>Meetup agency</th>
-            <td>{{ topic.meetup.agency ? topic.meetup.agency.label : '' }}</td>
+            <td>{{ topic.meetup.agency ? topic.meetup.agency.name : '' }}</td>
         </tr>
         {# ROLE_BOARD_USER part ########################################## START #}
         {% if is_granted('ROLE_BOARD_USER') %}
