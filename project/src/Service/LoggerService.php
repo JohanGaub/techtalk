@@ -15,14 +15,15 @@ readonly class LoggerService
     public function log(
         string            $level,
         string            $messageFormat,
-        array             $subjects,
+        array             $subjects = null,
         \Throwable|string $exception = ''
     ): void {
         $exceptionMessage = $exception instanceof \Throwable
             ? sprintf(' Exception: %s', $exception->getMessage())
             : '';
+        $implodedSubjects = $subjects ? implode(', ', $subjects) : '';
 
-        $message = sprintf($messageFormat, implode(', ', $subjects), $exceptionMessage);
+        $message = sprintf($messageFormat, $implodedSubjects, $exceptionMessage);
 
         $this->logger->log($level, $message);
     }

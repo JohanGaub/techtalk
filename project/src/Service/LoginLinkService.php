@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Repository\UserRepository;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\Recipient;
@@ -22,14 +22,17 @@ readonly class LoginLinkService
         private NotifierInterface         $notifier,
         private LoginLinkHandlerInterface $loginLinkHandler,
         private UserRepository $userRepository,
-        private LoggerInterface $logger,
+        private LoggerService    $loggerService
     ) {
     }
 
     public function sendLoginLink(string $postedEmail): void
     {
         if (!$this->validateEmail($postedEmail)) {
-            $this->logError('Invalid email: %s');
+            $this->loggerService->log(
+                LogLevel::ERROR,
+                'Invalid email: %s.'
+            );
             return;
         }
 
@@ -38,18 +41,30 @@ readonly class LoginLinkService
             $loginLinkDetails = $this->generateLoginLink($user);
 
             $this->notifyUser($loginLinkDetails, $user);
-        } catch (UserNotFoundException $e) {
+        } catch (UserNotFoundException $userNotFoundException) {
             // If user not found, log the error.
-            $this->logExceptionMessage($e, $postedEmail, 'User not found: %s.');
-        } catch (ExpiredLoginLinkException|TransportExceptionInterface $e) {
+            $this->loggerService->log(
+                LogLevel::ERROR,
+                'User with posted email %s not found.',
+                [$postedEmail],
+                $userNotFoundException
+            );
+
+        } catch (ExpiredLoginLinkException|TransportExceptionInterface $exception) {
             // If the link is expired or has a transport exception, log the error.
-            $this->logExceptionMessage($e, $postedEmail, 'Failed to send login link to %s.');
-        } catch (\Exception $e) {
+            $this->loggerService->log(
+                LogLevel::ERROR,
+                'Failed to send login link to %s.',
+                [$postedEmail],
+                $exception
+            );
+        } catch (\Exception $exception) {
             // Catch any other exceptions that might arise and log them.
-            $this->logExceptionMessage(
-                $e,
-                $postedEmail,
-                'An unexpected error occurred while sending login link to %s.'
+            $this->loggerService->log(
+                LogLevel::ERROR,
+                'An unexpected error occurred while sending login link to %s.',
+                [$postedEmail],
+                $exception
             );
         }
     }
@@ -66,11 +81,11 @@ readonly class LoginLinkService
         return $isValid;
     }
 
-    private function getUser(string $email): UserInterface
+    private function getUser(string $postedEmail): UserInterface
     {
-        $user = $this->userRepository->findOneBy(['email' => $email]);
+        $user = $this->userRepository->findOneBy(['email' => $postedEmail]);
         if (null === $user) {
-            throw new UserNotFoundException('User not found');
+            throw new UserNotFoundException('User not found.');
         }
 
         return $user;
@@ -103,16 +118,5 @@ readonly class LoginLinkService
         }
 
         return new Recipient($user->getEmail());
-    }
-
-    private function logError(string $message): void
-    {
-        $this->logger->error($message);
-    }
-
-    private function logExceptionMessage(\Throwable $e, string $postedEmail, string $messageFormat): void
-    {
-        $message = sprintf(sprintf('%s, Exception: %%s', $messageFormat), $postedEmail, $e->getMessage());
-        $this->logError($message);
     }
 }
