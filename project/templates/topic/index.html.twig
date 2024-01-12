@@ -10,7 +10,7 @@
         <thead>
         <tr>
             <th>Id</th>
-            <th>Label</th>
+            <th>Name</th>
             <th>Description</th>
             <th>Duration</th>
             <th>DurationCategory</th>
@@ -38,16 +38,16 @@
         {% for topic in topics %}
             <tr>
                 <td>{{ topic.id }}</td>
-                <td>{{ topic.label }}</td>
+                <td>{{ topic.name }}</td>
                 <td>{{ topic.description }}</td>
                 <td>{{ topic.duration ? topic.duration.format('%h:%I') : '' }}</td>
                 <td>{{ topic.durationCategory ? topic.durationCategory.value : '' }}</td>
                 <td>{{ topic.currentPlace }}</td>
                 <td>{{ topic.userPresenter.email }}</td>
-                <td>{{ topic.meetup.label ? topic.meetup.label : '' }}</td>
-                <td>{{ topic.meetup.startDate ? topic.meetup.startDate|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ topic.meetup.endDate ? topic.meetup.endDate|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ topic.meetup.agency.label ? topic.meetup.agency.label : '' }}</td>
+                <td>{{ topic.meetup.name|default('') }}</td>
+                <td>{{ (topic.meetup.startDate is defined) ? topic.meetup.startDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ (topic.meetup.endDate is defined) ? topic.meetup.endDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ topic.meetup.agency.name|default('') }}</td>
                 {# ROLE_BOARD_USER part ########################################## START #}
                 {% if is_granted('ROLE_BOARD_USER') %}
                     <td>{{ topic.userProposer ? topic.userProposer.email : '' }}</td>
@@ -82,4 +82,7 @@
     </table>
 
     <a href="{{ path('topic_create') }}">Create new</a>
+
+    <a href="{{ path('logout') }}" class="btn btn-primary">Logout</a>
+
 {% endblock %}

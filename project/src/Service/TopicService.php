@@ -9,6 +9,7 @@ use App\Enum\CurrentPlace;
 use App\Exception\TopicStateException;
 use App\Repository\TopicRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Workflow\Exception\LogicException;
@@ -21,17 +22,16 @@ readonly class TopicService
         private WorkflowInterface      $workflow,
         private TopicRepository        $topicRepository,
         private EntityManagerInterface $entityManager,
-        private Security               $security
+        private Security               $security,
+        private LoggerService          $loggerService
     ) {
     }
 
     public function getTopics(array $roles): array
     {
-        if (in_array('ROLE_BOARD_USER', $roles)) {
-            return $this->topicRepository->getTopicsForBoardUser();
-        }
-
-        return $this->topicRepository->getTopicsForUser();
+        return in_array('ROLE_BOARD_USER', $roles)
+            ? $this->topicRepository->getTopicsForBoardUser()
+            : $this->topicRepository->getTopicsForUser();
     }
 
     public function review(Topic $topic): void
@@ -70,7 +70,18 @@ readonly class TopicService
     {
         try {
             $this->workflow->apply($topic, $transition);
+            $this->loggerService->log(
+                LogLevel::INFO,
+                'Transition %s applied to topic with ID: %s.',
+                [$transition, $topic->getId()]
+            );
         } catch (LogicException $logicException) {
+            $this->loggerService->log(
+                LogLevel::ERROR,
+                'Failed to apply transition %s to topic with ID: %s.',
+                [$transition, $topic->getId()],
+                $logicException
+            );
             // Throw a custom exception here and handle this in your controller,
             // to show an error message to the user
             throw new TopicStateException(
