@@ -85,4 +85,5 @@
 
     <a href="{{ path('logout') }}" class="btn btn-primary">Logout</a>
 
+    <a href="{{ path('pdf', {'templateName': 'topic/index.html.twig', 'data': {'topicIds': topics|map(topic => topic.id)}}) }}" class="btn btn-secondary">Pdf</a>
 {% endblock %}

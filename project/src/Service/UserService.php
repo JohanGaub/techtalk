@@ -53,7 +53,7 @@ readonly class UserService
             } catch (\Exception $exception) {
                 ++$failure;
 
-                $email = $user instanceof \App\Entity\User ? $user->getEmail() : 'Unknown';
+                $email = $user instanceof User ? $user->getEmail() : 'Unknown';
                 $this->loggerService->log(
                     LogLevel::ERROR,
                     'Error while adding user with email %s.',

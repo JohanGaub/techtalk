@@ -13,7 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ticket-0042 : refactor file uploader service.
 - Ticket-0043 : refactor login link service.
 - Ticket-0044 : refactor login link service again.
-- Ticket-0044 : refactor topic service.
+- Ticket-0045 : refactor topic service.
+- Ticket-0046 : refactor user service.
+- Ticket-0047 : test html to pdf.
 
 ### Deprecated
 
