@@ -2,23 +2,18 @@
 
 namespace App\Controller\Admin;
 
-use App\Controller\Admin\Trait\DetailTrait;
 use App\Entity\Agency;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
-class AgencyCrudController extends AbstractCrudController
+class AgencyCrudControllerAbstract extends AbstractCommonCrudController
 {
-    use DetailTrait;
-
     public static function getEntityFqcn(): string
     {
         return Agency::class;
     }
-
 
     public function configureFields(string $pageName): iterable
     {

@@ -30,7 +30,7 @@ class TopicController extends AbstractController
     {
         $topics = $topicService->getTopics($this->getUser()->getRoles());
 
-        return $this->render('topic/index.html.twig', [
+        return $this->render('topic/form.html.twig', [
             'topics' => $topics,
         ]);
     }

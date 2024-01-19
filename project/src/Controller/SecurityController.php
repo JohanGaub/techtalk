@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Form\LoginCheckType;
+use App\Form\ResetPasswordType;
 use App\Form\UserFileType;
 use App\Repository\UserRepository;
 use App\Service\FileUploaderService;
 use App\Service\LoginLinkService;
 use App\Service\UserService;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +25,7 @@ use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\LoginLink\Exception\ExpiredLoginLinkException;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkNotification;
@@ -31,31 +36,43 @@ class SecurityController extends AbstractController
 
     private const STATUS_FAILURE = 'failure';
 
-    #[Route('/login_link', name: 'login_link', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    #[Route('/login-link', name: 'login_link', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function loginLink(
+        Request          $request,
         LoginLinkService $loginLinkService,
-        Request          $request
+        UserRepository   $userRepository
     ): Response {
-        // check if login form is submitted
-        if ($request->isMethod(Request::METHOD_POST)) {
-            $postedEmail = $request->request->get('email');
+        $form = $this->createForm(EmailType::class);
 
-            $loginLinkService->sendLoginLink($postedEmail);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $email = $form->getData();
 
-            // render a "Login link is sent!" page
-            return $this->render('security/login_link_sent.html.twig', [
-                'user_email' => $postedEmail,
+            if (null !== $userRepository->findOneBy(['email' => $email])) {
+                $loginLinkService->sendLoginLink($email, 'Link to connect to Techtalk website!');
+                $this->addFlash('success', [
+                    'message' => 'security.login.link_sent',
+                    'params' => ['%email%' => $email]
+                ]);
+                return $this->render('security/login_link_sent.html.twig', [
+                    'user_email' => $email,
+                ]);
+            }
+
+            $this->addFlash('error', [
+                'message' => 'Username could not be found.',
+                'params' => []
             ]);
+            return $this->redirectToRoute('login');
         }
 
-        // if it's not submitted, render the "login" form
+        // if it's not submitted, render the "login_link" form
         return $this->render('security/login_link.html.twig', [
-            'controller_name' => self::class,
-            // créer les formulaires en php pour cette page et les ajouter ici.
+            'form' => $form,
         ]);
     }
 
-    #[Route('/login_links', name: 'login_links', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    #[Route('/login-links', name: 'login_links', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function loginLinks(
         NotifierInterface         $notifier,
         LoginLinkHandlerInterface $loginLinkHandler,
@@ -110,11 +127,13 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * After clicking on the login link, the user is redirected to this route.
+     * Inside its email, after clicking on the login link, the user is redirected to this route.
      */
-    #[Route('/login_check', name: 'login_check')]
-    public function check(Request $request): Response
-    {
+    #[Route('/login-check', name: 'login_check')]
+    public function loginCheck(
+        Request $request,
+    ): Response {
+
         $form = $this->createForm(LoginCheckType::class, [
             "expires" => $request->query->get('expires'),
             "user_email" => $request->query->get('user'),
@@ -126,10 +145,65 @@ class SecurityController extends AbstractController
         // from SF 6.2, render() method calls $form->createView() to transform the form into a form view instance.
         return $this->render('security/process_login_link.html.twig', [
             'form' => $form,
+            'message' => $request->getSession()->get('message'),
         ]);
     }
 
-    #[Route('/upload_users', name: 'upload_users', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    #[Route('/reset-password', name: 'reset_password', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function resetPassword(
+        #[CurrentUser] User    $user,
+        Request                $request,
+        EntityManagerInterface $entityManager,
+        Security               $security,
+    ): Response {
+
+        $form = $this->createForm(ResetPasswordType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $entityManager->flush();
+
+                $this->addFlash('success', [
+                    'message' => 'security.reset_password.success',
+                    'params' => []
+                ]);
+            } catch (\Exception $e) {
+                /**
+                 * Use a global error message in order to avoid giving too much information.
+                 */
+                $this->addFlash('error', [
+                    'message' => 'security.global.error',
+                    'params' => []
+                ]);
+            }
+
+            /**
+             * log the user automatically after resetting their password.
+             * Use the 'form_login' authenticator name and the 'main' firewall name.
+             * @see https://symfony.com/doc/current/security.html#login-programmatically
+             */
+//            $security->login($user, 'form_login', 'main');
+
+            return $this->redirectToRoute('login');
+        }
+
+        return $this->render('security/reset_password.html.twig', [
+            'form' => $form,
+        ]);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    #[Route('/logout', name: 'logout', methods: [Request::METHOD_GET])]
+    public function logout(): never
+    {
+        // controller can be blank: it will never be called!
+        throw new AccessDeniedException("Don't forget to activate logout in security.yaml");
+    }
+
+    #[Route('/upload-users', name: 'upload_users', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function uploadUsers(
         Request             $request,
         FileUploaderService $fileUploaderService,
@@ -162,15 +236,5 @@ class SecurityController extends AbstractController
         return $this->render('security/upload_users.html.twig', [
             'upload_form' => $form,
         ]);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    #[Route('/logout', name: 'logout', methods: [Request::METHOD_GET])]
-    public function logout(): never
-    {
-        // controller can be blank: it will never be called!
-        throw new AccessDeniedException("Don't forget to activate logout in security.yaml");
     }
 }

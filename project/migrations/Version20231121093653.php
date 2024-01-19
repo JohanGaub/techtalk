@@ -28,13 +28,13 @@ final class Version20231121093653 extends AbstractMigration
         $this->addSql(
             'CREATE TABLE user (
                     id INT AUTO_INCREMENT NOT NULL,
-                    agency_id INT NOT NULL,
+                    agency_id INT DEFAULT NULL,
                     email VARCHAR(180) NOT NULL,
                     roles JSON NOT NULL,
                     password VARCHAR(255) NOT NULL,
-                    first_name VARCHAR(100) NOT NULL,
-                    last_name VARCHAR(100) NOT NULL,
-                    enabled TINYINT(1) NOT NULL,
+                    first_name VARCHAR(100) DEFAULT NULL,
+                    last_name VARCHAR(100) DEFAULT NULL,
+                    is_enabled TINYINT(1) DEFAULT NULL,
                     created_at DATETIME NOT NULL,
                     updated_at DATETIME NOT NULL,
                     UNIQUE INDEX UNIQ_8D93D649E7927C74 (email),

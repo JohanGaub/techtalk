@@ -7,9 +7,12 @@ namespace App\Service;
 use App\Entity\Agency;
 use App\Entity\User;
 use App\Repository\AgencyRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 readonly class UserService
 {
@@ -17,8 +20,20 @@ readonly class UserService
         private string                 $userDirectory,
         private EntityManagerInterface $entityManager,
         private AgencyRepository       $agencyRepository,
+        private UserRepository        $userRepository,
         private LoggerService    $loggerService
     ) {
+    }
+
+    public function getUserByEmail(string $email): UserInterface
+    {
+        $user = $this->userRepository->findOneBy(['email' => $email]);
+
+        if (null === $user) {
+            throw new UserNotFoundException('User not found.');
+        }
+
+        return $user;
     }
 
     public function addUsers($fileName): array
@@ -53,7 +68,7 @@ readonly class UserService
             } catch (\Exception $exception) {
                 ++$failure;
 
-                $email = $user instanceof \App\Entity\User ? $user->getEmail() : 'Unknown';
+                $email = $user instanceof User ? $user->getEmail() : 'Unknown';
                 $this->loggerService->log(
                     LogLevel::ERROR,
                     'Error while adding user with email %s.',
@@ -84,13 +99,13 @@ readonly class UserService
     private function createUser(array $data): User
     {
         $user = new User();
-        $user->setEmail(uniqid('user_') . '@gmail.com');
-        //            $user->setEmail($data[0]); // use it when we want to use every role
+        //        $user->setEmail(uniqid('user_') . '@gmail.com'); // use it to add random email addresses.
+        $user->setEmail($data[0]);
         $user->setFirstName($data[1]);
         $user->setLastName($data[2]);
         $user->setRoles(explode(",", $data[3]));
         $user->setAgency($this->getAgencyById($data[4]));
-        $user->setEnabled((bool) $data[5]);
+        $user->setIsEnabled((bool) $data[5]);
         /**
          * Set a default password because when creating user it is needed even if we don't use it.
          * Indeed, we use the login link feature to connect to the website.

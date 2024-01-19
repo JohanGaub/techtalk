@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Repository\UserRepository;
 use Psr\Log\LogLevel;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Notifier\NotifierInterface;
@@ -21,26 +20,27 @@ readonly class LoginLinkService
     public function __construct(
         private NotifierInterface         $notifier,
         private LoginLinkHandlerInterface $loginLinkHandler,
-        private UserRepository $userRepository,
+        private UserService $userService,
         private LoggerService    $loggerService
     ) {
     }
 
-    public function sendLoginLink(string $postedEmail): void
+    public function sendLoginLink(string $postedEmail, string $emailSubject): void
     {
         if (!$this->validateEmail($postedEmail)) {
             $this->loggerService->log(
                 LogLevel::ERROR,
-                'Invalid email: %s.'
+                'Invalid email: %s.',
+                [$postedEmail]
             );
             return;
         }
 
         try {
-            $user = $this->getUser($postedEmail);
+            $user = $this->userService->getUserByEmail($postedEmail);
             $loginLinkDetails = $this->generateLoginLink($user);
 
-            $this->notifyUser($loginLinkDetails, $user);
+            $this->notifyUser($user, $loginLinkDetails, $emailSubject);
         } catch (UserNotFoundException $userNotFoundException) {
             // If user not found, log the error.
             $this->loggerService->log(
@@ -81,33 +81,23 @@ readonly class LoginLinkService
         return $isValid;
     }
 
-    private function getUser(string $postedEmail): UserInterface
-    {
-        $user = $this->userRepository->findOneBy(['email' => $postedEmail]);
-        if (null === $user) {
-            throw new UserNotFoundException('User not found.');
-        }
-
-        return $user;
-    }
-
     private function generateLoginLink(UserInterface $user): LoginLinkDetails
     {
         return $this->loginLinkHandler->createLoginLink($user);
     }
 
-    private function notifyUser(LoginLinkDetails $loginLinkDetails, UserInterface $user): void
+    private function notifyUser(UserInterface $user, LoginLinkDetails $loginLinkDetails, string $emailSubject): void
     {
-        $notification = $this->createNotification($loginLinkDetails);
+        $notification = $this->createNotification($loginLinkDetails, $emailSubject);
         $recipient = $this->createRecipient($user);
         $this->notifier->send($notification, $recipient);
     }
 
-    private function createNotification(LoginLinkDetails $loginLinkDetails): LoginLinkNotification
+    private function createNotification(LoginLinkDetails $loginLinkDetails, string $emailSubject): LoginLinkNotification
     {
         return new LoginLinkNotification(
             $loginLinkDetails,
-            'Link to connect to Techtalk website!'
+            $emailSubject
         );
     }
 

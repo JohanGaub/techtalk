@@ -9,10 +9,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use TimestampableEntity;
@@ -34,17 +36,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\Column(length: 100, nullable: false)]
+    #[ORM\Column(length: 100, nullable: true)]
     private ?string $firstName = null;
 
-    #[ORM\Column(length: 100, nullable: false)]
+    #[ORM\Column(length: 100, nullable: true)]
     private ?string $lastName = null;
 
-    #[ORM\Column(nullable: false)]
-    private ?bool $enabled = null;
+    #[ORM\Column(nullable: true)]
+    private ?bool $isEnabled = null;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Agency $agency = null;
 
     #[ORM\OneToMany(mappedBy: 'userProposer', targetEntity: Topic::class)]
@@ -171,12 +173,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function isEnabled(): ?bool
     {
-        return $this->enabled;
+        return $this->isEnabled;
     }
 
-    public function setEnabled(?bool $enabled): self
+    public function setIsEnabled(?bool $isEnabled): self
     {
-        $this->enabled = $enabled;
+        $this->isEnabled = $isEnabled;
 
         return $this;
     }

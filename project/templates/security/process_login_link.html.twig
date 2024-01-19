@@ -3,7 +3,7 @@
 {% block title %}Process login link{% endblock %}
 
 {% block body %}
-    <h2>Hi! You are about to login to Techtalk...</h2>
+    <h2>{{ message|trans({}, 'security') }}</h2>
 
     {{ form_start(form) }}
     {{ form_row(form.expires) }}

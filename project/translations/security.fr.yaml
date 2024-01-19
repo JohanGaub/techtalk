@@ -1,0 +1,9 @@
+security.login.link_sent: Un lien a été envoyé à votre adresse email "%email%" pour vous connecter automatiquement.
+security.login.check.access.reset_password_page: Vous allez accéder à la page de réinitialisation du mot de passe.
+security.login.check.access.home_page: Vous allez accéder à la page d'accueil de Techtalk !
+security.forgot_password.label: Mot de passe oublié ?
+security.forgot_password.link_sent: Un lien a été envoyé à votre adresse email "%email%" pour réinitialiser votre mot de passe.
+security.reset_password.success: Votre mot de passe a été réinitialisé avec succès. Désormais, vous pouvez vous connecter.
+security.global.error: Une erreur est survenue. Veuillez réessayer plus tard.
+security.password.label: Mot de passe
+security.password.confirm: Confirmation du mot de passe

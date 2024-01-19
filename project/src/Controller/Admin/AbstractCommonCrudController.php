@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Controller\Admin\Trait;
+namespace App\Controller\Admin;
 
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
-trait DetailTrait
+abstract class AbstractCommonCrudController extends AbstractCrudController
 {
     public const ACTION_INDEX_ICON = 'fa-solid fa-list-ul';
 
@@ -39,31 +40,31 @@ trait DetailTrait
             ->update(
                 Crud::PAGE_INDEX,
                 Action::DETAIL,
-                static fn (Action $action)
+                static fn (Action $action): Action
                 => $action->setIcon(self::ACTION_SHOW_ICON)->setLabel(false)
             )
             ->update(
                 Crud::PAGE_INDEX,
                 Action::EDIT,
-                static fn (Action $action)
+                static fn (Action $action): Action
                 => $action->setIcon(self::ACTION_EDIT_ICON)->setLabel(false)
             )
             ->update(
                 Crud::PAGE_INDEX,
                 Action::DELETE,
-                static fn (Action $action)
+                static fn (Action $action): Action
                 => $action->setIcon(self::ACTION_DELETE_ICON)->setLabel(false)
             )
             ->update(
                 Crud::PAGE_INDEX,
                 Action::NEW,
-                static fn (Action $action)
+                static fn (Action $action): Action
                 => $action->setIcon(self::ACTION_NEW_ICON)->setLabel(false)
             )
             ->update(
                 Crud::PAGE_INDEX,
                 Action::BATCH_DELETE,
-                static fn (Action $action)
+                static fn (Action $action): Action
                 => $action->setIcon(self::ACTION_DELETE_ICON)->setLabel(false)
             )
             /**
@@ -75,18 +76,18 @@ trait DetailTrait
             ->update(
                 Crud::PAGE_NEW,
                 Action::INDEX,
-                static fn (Action $action) => $action->setIcon(self::ACTION_INDEX_ICON)->setLabel(false)
+                static fn (Action $action): Action => $action->setIcon(self::ACTION_INDEX_ICON)->setLabel(false)
             )
             ->update(
                 Crud::PAGE_NEW,
                 Action::SAVE_AND_RETURN,
-                static fn (Action $action)
+                static fn (Action $action): Action
                 => $action->setIcon(self::ACTION_SAVE_AND_RETURN_ICON)->setLabel(false)
             )
             ->update(
                 Crud::PAGE_NEW,
                 Action::SAVE_AND_ADD_ANOTHER,
-                static fn (Action $action)
+                static fn (Action $action): Action
                 => $action->setIcon(self::ACTION_SAVE_AND_ADD_ANOTHER_ICON)->setLabel(false)
             )
             /**
@@ -98,12 +99,12 @@ trait DetailTrait
             ->update(
                 Crud::PAGE_EDIT,
                 Action::INDEX,
-                static fn (Action $action) => $action->setIcon(self::ACTION_INDEX_ICON)->setLabel(false)
+                static fn (Action $action): Action => $action->setIcon(self::ACTION_INDEX_ICON)->setLabel(false)
             )
             ->update(
                 Crud::PAGE_EDIT,
                 Action::SAVE_AND_RETURN,
-                static fn (Action $action)
+                static fn (Action $action): Action
                 => $action->setIcon(self::ACTION_SAVE_AND_RETURN_ICON)->setLabel(false)
             )
             /**
@@ -113,17 +114,17 @@ trait DetailTrait
             ->update(
                 Crud::PAGE_DETAIL,
                 Action::INDEX,
-                static fn (Action $action) => $action->setIcon(self::ACTION_INDEX_ICON)->setLabel(false)
+                static fn (Action $action): Action => $action->setIcon(self::ACTION_INDEX_ICON)->setLabel(false)
             )
             ->update(
                 Crud::PAGE_DETAIL,
                 Action::EDIT,
-                static fn (Action $action) => $action->setIcon(self::ACTION_EDIT_ICON)->setLabel(false)
+                static fn (Action $action): Action => $action->setIcon(self::ACTION_EDIT_ICON)->setLabel(false)
             )
             ->update(
                 Crud::PAGE_DETAIL,
                 Action::DELETE,
-                static fn (Action $action) => $action->setIcon(self::ACTION_DELETE_ICON)->setLabel(false)
+                static fn (Action $action): Action => $action->setIcon(self::ACTION_DELETE_ICON)->setLabel(false)
             )
         ;
     }

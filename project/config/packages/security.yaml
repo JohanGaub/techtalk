@@ -21,7 +21,51 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            # As we have now two entry points to log in (1. form_login and 2. login_link),
+            # we must specify the default entry point.
+            entry_point: form_login
+
+            ### 1. form_login entry point ###
+            form_login:
+                #                login_path: login
+                check_path: login
+                enable_csrf: true
+
+            ### 2. login_link entry point ###
             login_link:
+                # The route to consume the link with user signature parameters (see below).
+                check_route: login_check
+                # Properties used to create a signed URL that uniquely identifies the user.
+                signature_properties: [ 'id', 'email', 'password' ]
+                # only allow the link to be used 3 times.
+                max_uses: 3
+                # Avoid email providers and browsers 'preview of the links' to be counted as ONE use.
+                check_post_only: true
+                # lifetime in seconds (300 seconds = 5 minutes).
+                lifetime: 300
+                # When the login link FAILED, redirect to the login page to try their email and password.
+                login_path: login
+                # When the login link SUCCEEDED, redirect to the reset_password page if no page is specified.
+                # Thus, the user can change/reset its password.
+#                default_target_path: reset_password
+                # Redirect to the route defined by default_target_path after a successful authentication,
+                #even if the user requested another page.
+#                always_use_default_target_path: true
+                success_handler: App\Handler\LoginLinkSuccessHandler
+            logout:
+                path: logout
+                target: login
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#the-firewall
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            switch_user: true
+        admin:
+            pattern: ^/admin
+            lazy: true
+            provider: app_user_provider
+            login_link:
+                # The route to consume the link with user signature parameters (see below).
                 check_route: login_check
                 # Properties used to create a signed URL that uniquely identifies the user.
                 signature_properties: [ 'id', 'email' ]
@@ -34,10 +78,16 @@ security:
 
                 # optionally, configure the cache pool.
                 #used_link_cache: 'cache.redis'
+            form_login:
+                # "login" is the name of the route created previously
+                login_path: login
+                check_path: login
+                enable_csrf: true
             logout:
                 path: logout
                 # where to redirect after logout
-                target: login_link
+#                target: login_link
+                target: login
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
@@ -47,7 +97,8 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-     - { path: ^/login_link, roles: PUBLIC_ACCESS }
+     - { path: ^/reset_password, allow_if: token.hasAttribute("login_link_to_access_reset_password") }
+     - { path: ^/login_link, roles: ROLE_ADMIN }
      - { path: ^/home, roles: ROLE_USER }
      - { path: ^/admin, roles: ROLE_ADMIN }
 

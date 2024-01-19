@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app.locale }}">
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Techtalk{% endblock %}</title>
@@ -14,19 +14,18 @@
         {% endblock %}
     </head>
 
-{#    TODO: add errors handling#}
-{#    {%- block form_errors -%}#}
-{#        {%- if errors|length > 0 -%}#}
-{#            <ul>#}
-{#                {%- for error in errors -%}#}
-{#                    <li class="{{ error.cause.constraint.payload.severity ?? '' }}">{{ error.message }}</li>#}
-{#                {%- endfor -%}#}
-{#            </ul>#}
-{#        {%- endif -%}#}
-{#    {%- endblock form_errors -%}#}
-
     <body>
+        {%- block messages -%}
+            {% for label, messages in app.flashes %}
+                {#        {{ dump(label, messages, app.flashes) }}#}
+                {% for message in messages %}
+                    <div class="flash-{{ label }}">
+                        {{ message.message|trans(message.params, 'security', 'fr') }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        {%- endblock messages -%}
+
         {% block body %}{% endblock %}
     </body>
-
 </html>

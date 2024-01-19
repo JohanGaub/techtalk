@@ -1,0 +1,9 @@
+security.login.link_sent: A link has been sent to your email address "%email%" in order to log in automatically.
+security.login.check.access.reset_password_page: You are about to access the reset password page.
+security.login.check.access.home_page: You are about to access Techtalk home page!
+security.forgot_password.label: Forgot your password?
+security.forgot_password.link_sent: A link has been sent to your email address "%email%" in order to reset your password.
+security.reset_password.success: Your password has been successfully reset. Now, you can log in.
+security.global.error: An error occurred. Please try again later.
+security.password.label: Password
+security.password.confirm: Confirm password

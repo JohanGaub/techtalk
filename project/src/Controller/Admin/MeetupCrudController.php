@@ -2,9 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Controller\Admin\Trait\DetailTrait;
 use App\Entity\Meetup;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
@@ -13,15 +11,12 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
-class MeetupCrudController extends AbstractCrudController
+class MeetupCrudController extends AbstractCommonCrudController
 {
-    use DetailTrait;
-
     public static function getEntityFqcn(): string
     {
         return Meetup::class;
     }
-
 
     public function configureFields(string $pageName): iterable
     {
